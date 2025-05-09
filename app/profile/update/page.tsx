@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import UpdateForm from "./UpdateForm";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -40,10 +41,10 @@ export default async function ProfilePage() {
           <Input readOnly value={profile.profile_name} />
           <p><em>This is what other community members will see. We recommended using your full name</em></p>
         </div>
-        <div>
-          <Label>Department</Label>
-          <Input readOnly value={profile.department || ""} />
-        </div>
+        <UpdateForm
+          userId={profile.id}
+          initialDepartment={profile.department}
+        />
         
 
         <h2 className="text-2xl font-semibold mb-4">Private Profile</h2>
