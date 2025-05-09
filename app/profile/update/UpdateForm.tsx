@@ -20,14 +20,18 @@ export default function UpdateForm({ userId, initialDepartment }: Props) {
   const [pending, startTransition] = useTransition();
   const supabase = createClient();
 
+  const originalDeptRef = useRef(initialDepartment ?? "");
   const isFirstRun = useRef(true);
-  const debounceRef = useRef<number>();
+  const debounceRef = useRef<number | undefined>(undefined);
 
   // central save function
   async function saveDept(value = dept) {
     const clean = value.trim();
     if (!clean) {
       toast.error("Department can’t be empty");
+      return;
+    }
+    if (clean === originalDeptRef.current) {
       return;
     }
 
@@ -45,30 +49,33 @@ export default function UpdateForm({ userId, initialDepartment }: Props) {
         toast.error(`Update failed: ${error.message}`);
       } else {
         toast.success("Department saved!");
+        // update our “last saved” ref so future calls bail out if no change
+        originalDeptRef.current = clean;
       }
     });
   }
 
   /* --------------------------- UI --------------------------- */
   // on form submit (keep if you still want a button)
-  async function handleSubmit(e: FormEvent) {
+  function handleSubmit(e: FormEvent) {
     e.preventDefault();
     saveDept();
   }
 
   // debounce on typing stop
+  // debounce on typing
   useEffect(() => {
     if (isFirstRun.current) {
       isFirstRun.current = false;
       return;
     }
-    window.clearTimeout(debounceRef.current);
+    clearTimeout(debounceRef.current);
     debounceRef.current = window.setTimeout(() => {
       saveDept();
     }, 1000);
 
     // clean up on unmount or next keystroke
-    return () => window.clearTimeout(debounceRef.current);
+    return () => clearTimeout(debounceRef.current);
   }, [dept]);
 
   return (
@@ -80,7 +87,7 @@ export default function UpdateForm({ userId, initialDepartment }: Props) {
         value={dept}
         onChange={(e) => setDept(e.target.value)}
         onBlur={() => {
-          window.clearTimeout(debounceRef.current);
+          clearTimeout(debounceRef.current);
           saveDept();
         }}
       />
