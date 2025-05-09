@@ -1,7 +1,7 @@
 // app/profile/update/UpdateForm.tsx
 "use client";
 
-import { useState, useTransition, FormEvent } from "react";
+import { useState, useTransition, useEffect, useRef, FormEvent } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -20,12 +20,12 @@ export default function UpdateForm({ userId, initialDepartment }: Props) {
   const [pending, startTransition] = useTransition();
   const supabase = createClient();
 
+  const isFirstRun = useRef(true);
+  const debounceRef = useRef<number>();
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-
-    // Basic front‑end validation
-    const clean = dept.trim();
+  // central save function
+  async function saveDept(value = dept) {
+    const clean = value.trim();
     if (!clean) {
       toast.error("Department can’t be empty");
       return;
@@ -50,6 +50,27 @@ export default function UpdateForm({ userId, initialDepartment }: Props) {
   }
 
   /* --------------------------- UI --------------------------- */
+  // on form submit (keep if you still want a button)
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    saveDept();
+  }
+
+  // debounce on typing stop
+  useEffect(() => {
+    if (isFirstRun.current) {
+      isFirstRun.current = false;
+      return;
+    }
+    window.clearTimeout(debounceRef.current);
+    debounceRef.current = window.setTimeout(() => {
+      saveDept();
+    }, 1000);
+
+    // clean up on unmount or next keystroke
+    return () => window.clearTimeout(debounceRef.current);
+  }, [dept]);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-2">
       <Label htmlFor="department">Department</Label>
@@ -58,10 +79,11 @@ export default function UpdateForm({ userId, initialDepartment }: Props) {
         placeholder="e.g., Department of Physics"
         value={dept}
         onChange={(e) => setDept(e.target.value)}
+        onBlur={() => {
+          window.clearTimeout(debounceRef.current);
+          saveDept();
+        }}
       />
-      <Button type="submit" disabled={pending}>
-        {pending ? "Saving…" : "Save"}
-      </Button>
       <ToastContainer
         position="bottom-right"
         autoClose={1500}
