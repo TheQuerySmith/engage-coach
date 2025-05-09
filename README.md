@@ -1,104 +1,94 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# Instructor Survey Platform
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+A full-stack web application to streamline the administration, delivery, and reporting of student surveys for college instructors. Built using **Next.js**, **Supabase**, and **Qualtrics**, , the platform allows instructors to create accounts, launch surveys, and receive reports, while giving internal team members administrative oversight and automation tools.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+---
 
-## Features
+## 🚀 Goals / Milestones
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+- Instructors can:
 
-## Demo
+| Milestone | Description | Status |
+|----------|-------------|--------|
+| ✅ Profile | Update profile upon signup | In Progress |
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
 
-## Deploy to Vercel
+### 🛠️ Detailed Next steps
+ - [ ] Create a profile database table
+ - [ ] Create a profile page with next steps (upon signup)
+ - [ ] Create a profile update page ()
+ - [ ] Fix the auto email linking
 
-Vercel deployment will guide you through creating a Supabase account and project.
+ ### Optional features
+ - [ ] User can upload a profile picture
+ - [ ] User can upload a Bio  
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+### Profile Schema
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+Extends `auth.users` with additional fields for instructor profiles. The `user_id` column is a foreign key reference to the `auth.users` table, which is created by Supabase.
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+Optional columns are required for the profile to be considered complete. The `profile_name` column is a unique identifier for the instructor's profile and is generated using a random word generator if not provided. The `user_edited` column tracks whether the profile has been updated by the user, and the `consent` column indicates whether the user has consented to research.
 
-## Clone and run locally
+For roles, `member` is the default role for sign-ups that allows them to access all features of the platform. The `admin` role is reserved for internal team members and has additional privileges. The `lead` role is for instructors who have been designated as leads for a specific course or program that have the ability to invite others and see their reports. The `basic` role is for a future feature that allows instructors to use surveys but with limited reporting.
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+| column        | type | nullable | notes |
+|---------------|------|----------|-------|
+| `user_id` **PK** | `uuid` | no | **FK → auth.users.id** |
+| `email` | `text` | no | **FK → auth.users.email** |
+| `profile_name` | `text` | no | Display name; has to be unique; defaults random words|
+| `first_name`   | `text` | yes | Optional |
+| `last_name`    | `text` | yes | Optional |
+| `job_title` | `text` | yes | Optional |
+| `department` | `text` | yes | Optional |
+| `institution` | `text` | yes | Optional |
+| `role` | `text` | no | `'basic' ∣ 'member' 'lead' ∣ 'admin'` (default `instructor`) |
+| `user_edited` | `boolean` | no | Has this profile ever been updated? (default `false`) |
+| `consent` | `boolean` | no | Consent to research (default `false`) |
 
-2. Create a Next.js app using the Supabase Starter template npx command
+#### SQL Tables
+create table profiles (
+  id uuid primary key references auth.users(id),
+  email text not null default 'error@error.com',
+  profile_name text not null unique default random_profile(),
+  first_name text,
+  last_name text,
+  job_title text,
+  department text,
+  institution text,
+  role text default 'member' check (role IN ('basic','member','lead','admin')),
+  created_at timestamp with time zone default now(),
+  updated_at timestamp with time zone default now(),
+  user_edited boolean default false,
+  consent boolean default false
+);
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+SQL Functions
 
-3. Use `cd` to change into the app's directory
+```sql
+-- 1. Create (or replace) the trigger function
+CREATE OR REPLACE FUNCTION public.profiles_sync_email()
+RETURNS trigger AS $$
+BEGIN
+  -- Only overwrite if email was not explicitly provided
+  IF NEW.email IS NULL OR NEW.email = '' THEN
+    SELECT u.email
+      INTO NEW.email
+      FROM auth.users AS u
+     WHERE u.id = NEW.user_id;
+  END IF;
 
-   ```bash
-   cd with-supabase-app
-   ```
+  RETURN NEW;
+END;
+$$
+LANGUAGE plpgsql
+VOLATILE;
 
-4. Rename `.env.example` to `.env.local` and update the following:
-
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
-
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://app.supabase.com/project/_/settings/api)
-
-5. You can now run the Next.js local development server:
-
-   ```bash
-   npm run dev
-   ```
-
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
-
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
-
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
-
-## Feedback and issues
-
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
-
-## More Supabase examples
-
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+-- 2. Attach that function as a BEFORE INSERT trigger
+CREATE TRIGGER trg_profiles_sync_email
+  BEFORE INSERT ON public.profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION public.profiles_sync_email();
+```
