@@ -84,3 +84,16 @@ BEGIN
 END;
 ```
 
+Called on every insert to the profiles table. 
+```sql
+DECLARE
+  hex_part text;
+BEGIN
+  -- Generate an 8-character hex string from a random number’s MD5 hash
+  hex_part := substr(md5(random()::text), 1, 8);
+  
+  -- Prefix with whatever label you like (e.g., "member_" instead of "instructor_")
+  RETURN 'member_' || hex_part;
+END;
+
+
