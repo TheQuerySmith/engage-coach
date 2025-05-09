@@ -4,6 +4,8 @@ import { cookies } from "next/headers";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import UpdateForm from "./UpdateForm";
+import UpdateProfileField from "./UpdateForm";
+
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -34,43 +36,61 @@ export default async function ProfilePage() {
 
         <h2 className="text-2xl font-semibold mb-4">Public Profile</h2>
 
-        {/* primary fields */}
-
-        <div>
-          <Label>Profile Name</Label>
-          <Input readOnly value={profile.profile_name} />
-          <p><em>This is what other community members will see. We recommended using your full name</em></p>
-        </div>
-        <UpdateForm
-          userId={profile.id}
-          initialDepartment={profile.department}
+        <UpdateProfileField
+          userId={user.id}
+          column="profile_name"
+          label="Profile Name"
+          initialValue={profile.profile_name}
+          placeholder="e.g., Eric Smith"
+          note="This is the name that will be displayed when you participate in the community.
+          We recommend using your real name unless you would prefer to stay anonymous."
         />
-        
-
+        <UpdateProfileField
+          userId={user.id}
+          column="department"
+          label="Department"
+          initialValue={profile.department}
+          placeholder="e.g., Computer Science"
+          />
+       
         <h2 className="text-2xl font-semibold mb-4">Private Profile</h2>
         <p>Everything below is used for reports and only visible to our team</p>
-        <div>
-          <Label>Email</Label>
-          <Input readOnly value={profile.email} />
-        </div>
-        <div>
-          <Label>First Name</Label>
-          <Input readOnly value={profile.first_name || ""} />
-        </div>
-        <div>
-          <Label>Last Name</Label>
-          <Input readOnly value={profile.last_name || ""} />
-        </div>
-        <div>
-          <Label>Job Title</Label>
-          <Input readOnly value={profile.job_title || ""} />
-        </div>
-        <div>
-          <Label>Institution</Label>
-          <Input readOnly value={profile.institution || ""} />
-        </div>
-        
-        
+        <UpdateProfileField
+          userId={user.id}
+          column="email"
+          label="Email"
+          initialValue={profile.email}
+          placeholder="e.g., email@university.edu"
+        />
+
+        <UpdateProfileField
+          userId={user.id}
+          column="first_name"
+          label="First Name"
+          initialValue={profile.first_name}
+          placeholder="e.g., Eric"
+        />
+        <UpdateProfileField
+          userId={user.id}
+          column="last_name"
+          label="Last Name"
+          initialValue={profile.last_name}
+          placeholder="e.g., Smith"
+        />
+        <UpdateProfileField
+          userId={user.id}
+          column="job_title"
+          label="Job Title"
+          initialValue={profile.job_title}
+          placeholder="e.g., Assistant Professor"
+        />
+        <UpdateProfileField
+          userId={user.id}
+          column="institution"
+          label="Institution"
+          initialValue={profile.institution}
+          placeholder="e.g., UT Austin"
+        />
       </div>
 
       <details className="mt-6 border rounded-md">
