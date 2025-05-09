@@ -53,7 +53,6 @@ export default async function ProfilePage() {
           <Label>Email</Label>
           <Input readOnly value={profile.email} />
         </div>
-        <h2>Public Profile</h2>
         <div>
           <Label>First Name</Label>
           <Input readOnly value={profile.first_name || ""} />
