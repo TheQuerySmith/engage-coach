@@ -15,14 +15,18 @@ A full-stack web application to streamline the administration, delivery, and rep
 
 ### 🛠️ Detailed Next steps
  - [X] Create a profile database table
- - [X] Fix the auto email linking
  - [ ] Create a profile page with next steps (upon signup)
- - [ ] Create a profile update page ()
+ - [X] Create a profile update page ()
 
  ### Optional features
  - [ ] User can upload a profile picture
  - [ ] User can upload a Bio  
 
+
+### Bug Fixes
+- [X] Fix the auto email linking
+- [ ] Toast messages don't leave the screen on profile update
+- [ ] Email address should be validated on profile update
 
 ### Profile Schema
 
