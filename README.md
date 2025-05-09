@@ -14,10 +14,10 @@ A full-stack web application to streamline the administration, delivery, and rep
 
 
 ### 🛠️ Detailed Next steps
- - [ ] Create a profile database table
+ - [X] Create a profile database table
+ - [X] Fix the auto email linking
  - [ ] Create a profile page with next steps (upon signup)
  - [ ] Create a profile update page ()
- - [ ] Fix the auto email linking
 
  ### Optional features
  - [ ] User can upload a profile picture
@@ -67,28 +67,20 @@ create table profiles (
 
 SQL Functions
 
+
+Trigger profiles_sync_email BEFORE INSTERT on profiles (ROW)
+
 ```sql
--- 1. Create (or replace) the trigger function
-CREATE OR REPLACE FUNCTION public.profiles_sync_email()
-RETURNS trigger AS $$
 BEGIN
   -- Only overwrite if email was not explicitly provided
-  IF NEW.email IS NULL OR NEW.email = '' THEN
-    SELECT u.email
+  IF NEW.email IS NULL OR NEW.email = '' OR NEW.email = 'error@error.com' THEN
+    SELECT auth.users.email
       INTO NEW.email
-      FROM auth.users AS u
-     WHERE u.id = NEW.user_id;
+      FROM auth.users
+     WHERE auth.users.id = NEW.id;
   END IF;
 
   RETURN NEW;
 END;
-$$
-LANGUAGE plpgsql
-VOLATILE;
-
--- 2. Attach that function as a BEFORE INSERT trigger
-CREATE TRIGGER trg_profiles_sync_email
-  BEFORE INSERT ON public.profiles
-  FOR EACH ROW
-  EXECUTE FUNCTION public.profiles_sync_email();
 ```
+
