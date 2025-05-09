@@ -47,49 +47,65 @@ export default function Page() {
 export default function FetchDataSteps() {
   return (
     <ol className="flex flex-col gap-6">
-      <TutorialStep title="Create some tables and insert some data">
+      <TutorialStep title="Update your user profile">
         <p>
           Head over to the{" "}
           <a
-            href="https://supabase.com/dashboard/project/_/editor"
+            href="./profile/update"
             className="font-bold hover:underline text-foreground/80"
             target="_blank"
             rel="noreferrer"
           >
-            Table Editor
+            Profile Update Page
           </a>{" "}
-          for your Supabase project to create a table and insert some example
-          data. If you're stuck for creativity, you can copy and paste the
-          following into the{" "}
-          <a
-            href="https://supabase.com/dashboard/project/_/sql/new"
-            className="font-bold hover:underline text-foreground/80"
-            target="_blank"
-            rel="noreferrer"
-          >
-            SQL Editor
-          </a>{" "}
-          and click RUN!
+          to update your profile. Only your profile name and department will be visible
+          to other users. Everything else is private and only visible to our team. After
+          you update your profile, this item will be marked as complete.
         </p>
-        <CodeBlock code={create} />
       </TutorialStep>
 
-      <TutorialStep title="Query Supabase data from Next.js">
+      <TutorialStep title="Introduce yourself to the community">
         <p>
-          To create a Supabase client and query data from an Async Server
-          Component, create a new page.tsx file at{" "}
-          <span className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs font-medium text-secondary-foreground border">
-            /app/notes/page.tsx
-          </span>{" "}
-          and add the following.
+          Head over to the{" "}
+          <a
+            href="./community"
+            className="font-bold hover:underline text-foreground/80"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Community Page
+          </a>{" "}
+          to share an instructional win or learn what others are doing. After you post,
+          like, or comment, this item will be marked as complete.
         </p>
-        <CodeBlock code={server} />
-        <p>Alternatively, you can use a Client Component.</p>
-        <CodeBlock code={client} />
       </TutorialStep>
 
-      <TutorialStep title="Build in a weekend and scale to millions!">
-        <p>You're ready to launch your product to the world! 🚀</p>
+      <TutorialStep title="Receive a free book!">
+        <p>
+          Please indicate if you are interested in getting a free copy of Dr. David Yeager's book <em>10 to 25: 
+          The Science of Motivating Young People</em>, by filling out the {" "}
+          <a
+            href="./resources/10-to-25"
+            className="font-bold hover:underline text-foreground/80"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Book Request Form
+          </a>
+          , or indicate you do not want to receive a book.
+        </p>
+      </TutorialStep>
+
+      <TutorialStep title="Check our our library of resources">
+        <p>
+          Some words here.
+        </p>
+      </TutorialStep>
+
+      <TutorialStep title="Let the data flow!">
+        <p>Your surveys are all set up! You can find survey links for yours studnets at this 
+          page. On the date that you indicated, you can also complete this form (we will send 
+          a reminder email on DATE). If you'd like to change your particpaiton dates, please click here.</p>
       </TutorialStep>
     </ol>
   );
