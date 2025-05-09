@@ -21,12 +21,14 @@ A full-stack web application to streamline the administration, delivery, and rep
  ### Optional features
  - [ ] User can upload a profile picture
  - [ ] User can upload a Bio  
+ - [ ] User can upload a list of website links (social media, personal website, etc.)
 
 
 ### Bug Fixes
 - [X] Fix the auto email linking
 - [ ] Toast messages don't leave the screen on profile update
 - [ ] Email address should be validated on profile update
+- [ ] Add supabase error handling 
 
 ### Profile Schema
 
