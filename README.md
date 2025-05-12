@@ -29,6 +29,7 @@ A full-stack web application to streamline the administration, delivery, and rep
 - [ ] Add supabase error handling 
 - [ ] Update email doesn't update auth.users table
 - [ ] Need to create user_checklist row when user is created
+- [ ] More efficient subcomponents? (e.g., redirect within fetch-next-steps.tsx)
 
 ### Profile Schema
 

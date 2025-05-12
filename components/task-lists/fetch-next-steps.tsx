@@ -1,4 +1,6 @@
+import { createClient } from '@/utils/supabase/server'
 import { TutorialStep } from "./tutorial-step";
+import { redirect } from "next/navigation";
 
 const create = `create table notes (
   id bigserial primary key,
@@ -43,10 +45,42 @@ export default function Page() {
 }
 `.trim();
 
-export default function FetchNextSteps() {
+export default async function FetchNextSteps() {
+const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return redirect("/sign-in");
+  }
+
+  const { data: entries, error: fetchError } = await supabase
+    .from('user_checklist')
+    .select('completed, checklist_items(name)')
+    .eq('user_id', user.id)
+
+  if (fetchError) {
+    console.error(fetchError)
+    return <p className="text-center text-red-600 p-6">Failed to load your checklist.</p>
+  }
+
+  const completedMap = new Map(
+    entries.map((e) => [e.checklist_items.name, e.completed])
+  )
+
+  console.log(' 🔍 checklist entries:', entries)
+  console.log(
+    ' ✅ completedMap:',
+    Array.from(new Map(entries.map(e => [e.checklist_items.name, e.completed])))
+  )
+  console.log(completedMap.get("updated_user_profile"))
+
+
   return (
     <ol className="flex flex-col gap-6">
-      <TutorialStep title="Update your user profile">
+      <TutorialStep title="Update your user profile" checked={completedMap.get("updated_user_profile") ?? false}>
         <p>
           Head over to the{" "}
           <a
@@ -63,7 +97,7 @@ export default function FetchNextSteps() {
         </p>
       </TutorialStep>
 
-      <TutorialStep title="Introduce yourself to the community" checked={true} >
+      <TutorialStep title="Introduce yourself to the community" checked={completedMap.get("posted_community") ?? false} >
         <p>
           Head over to the{" "}
           <a
@@ -79,7 +113,7 @@ export default function FetchNextSteps() {
         </p>
       </TutorialStep>
 
-      <TutorialStep title="Receive a free book!">
+      <TutorialStep title="Receive a free book!" checked={completedMap.get("completed_book_signup") ?? false}>
         <p>
           Please indicate if you are interested in getting a free copy of Dr. David Yeager's book <em>10 to 25: 
           The Science of Motivating Young People</em>, by filling out the {" "}
@@ -95,15 +129,22 @@ export default function FetchNextSteps() {
         </p>
       </TutorialStep>
 
-      <TutorialStep title="Check our our library of resources">
+      <TutorialStep title="Check our our library of resources" checked={completedMap.get("clicked_library") ?? false}>
         <p>
           Some words here.
         </p>
       </TutorialStep>
 
-      <TutorialStep title="Let the data flow!">
+
+      <TutorialStep title="Send out student surveys" checked={completedMap.get("student_surveys") ?? false}>
         <p>Your surveys are all set up! You can find survey links for yours studnets at this 
           page. On the date that you indicated, you can also complete this form (we will send 
+          a reminder email on DATE). If you'd like to change your particpaiton dates, please click here.</p>
+      </TutorialStep>
+
+      <TutorialStep title="Complete instructor surveys" checked={completedMap.get("instructor_surveys") ?? false}>
+        <p>Your surveys are all set up! You can find survey links for yours studnets at this
+          page. On the date that you indicated, you can also complete this form (we will send
           a reminder email on DATE). If you'd like to change your particpaiton dates, please click here.</p>
       </TutorialStep>
     </ol>
