@@ -14,9 +14,7 @@ A full-stack web application to streamline the administration, delivery, and rep
 
 
 ### 🛠️ Detailed Next steps
- - [X] Create a profile database table
- - [ ] Create a profile page with next steps (upon signup)
- - [X] Create a profile update page ()
+ - [/] Create a profile page with next steps (upon signup) 
 
  ### Optional features
  - [ ] User can upload a profile picture
@@ -29,6 +27,7 @@ A full-stack web application to streamline the administration, delivery, and rep
 - [ ] Toast messages don't leave the screen on profile update
 - [ ] Email address should be validated on profile update
 - [ ] Add supabase error handling 
+- [ ] Update email doesn't update auth.users table
 
 ### Profile Schema
 
