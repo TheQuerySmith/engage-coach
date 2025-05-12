@@ -12,6 +12,17 @@ export default async function AuthButton() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const { data: profile, error: fetchError } = await supabase
+    .from('profiles')
+    .select('profile_name, email')
+    .eq('id', user?.id)
+    .single();
+
+  if (fetchError) {
+    console.error(fetchError)
+    return <p className="text-center text-red-600 p-6">Failed to load your checklist.</p>
+  }
+
   if (!hasEnvVars) {
     return (
       <>
@@ -50,7 +61,23 @@ export default async function AuthButton() {
   }
   return user ? (
     <div className="flex items-center gap-4">
-      Hey, {user.email}!
+      <Link href="/profile" className="font-normal hover:text-blue-500">
+        Survey Links
+      </Link>
+      <Link href="/profile" className="font-normal hover:text-blue-500">
+        Reports
+      </Link>
+
+      <Link href="/profile">
+        <Button
+          variant={"ghost"}
+          size="sm"
+          className="font-normal hover:text-blue-500"
+        >
+          {profile.profile_name ?? profile.email ?? user.email ?? ''}
+        </Button>
+      </Link>
+
       <form action={signOutAction}>
         <Button type="submit" variant={"outline"}>
           Sign out
