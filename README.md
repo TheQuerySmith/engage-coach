@@ -28,6 +28,7 @@ A full-stack web application to streamline the administration, delivery, and rep
 - [ ] Email address should be validated on profile update
 - [ ] Add supabase error handling 
 - [ ] Update email doesn't update auth.users table
+- [ ] Need to create user_checklist row when user is created
 
 ### Profile Schema
 
@@ -66,6 +67,23 @@ create table profiles (
   updated_at timestamp with time zone default now(),
   user_edited boolean default false,
   consent boolean default false
+);
+
+##### To make a checklist of user information
+
+create table checklist_items (
+  id   serial primary key,
+  name text not null unique,
+  description text
+);
+
+-- link each user → each item, with a boolean flag
+create table user_checklist (
+  user_id           uuid  references auth.users(id) on delete cascade,
+  checklist_item_id int   references checklist_items(id) on delete cascade,
+  completed         boolean not null default false,
+  completed_at      timestamptz,
+  primary key (user_id, checklist_item_id)
 );
 
 
