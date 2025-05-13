@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 import CourseList from "@/components/course-lists/fetch-courses";
+import Link from "next/link";
 
 export default async function ProtectedPage() {
   const supabase = await createClient();
@@ -24,6 +25,13 @@ export default async function ProtectedPage() {
         </div>
       </div>
       <CourseList />
+      <div className="text-center">
+      <Link href="/courses/add-course">
+        <span className="inline-block px-6 py-3 bg-blue-600 text-white rounded font-semibold no-underline cursor-pointer">
+          + Add New Course
+        </span>
+      </Link>
+      </div>
     </div>
   );
 }

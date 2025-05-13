@@ -60,13 +60,6 @@ export default function CourseList() {
           ))}
         </tbody>
       </table>
-      <div className="mt-5 text-center">
-        <Link href="/courses/add-course">
-          <span className="inline-block px-6 py-3 bg-blue-600 text-white rounded font-semibold no-underline cursor-pointer">
-        + Add New Course
-          </span>
-        </Link>
-      </div>
     </div>
   );
 }
