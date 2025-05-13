@@ -91,7 +91,7 @@ create table user_checklist (
 create table courses (
   id uuid primary key default gen_random_uuid(),
   short_id text unique not null default substring(md5(random()::text), 1, 5),
-  instructor_id uuid not null references profiles(id) on delete cascade,
+  user_id uuid not null references profiles(id) on delete cascade,
   title text not null default 'My Course Title',
   created_at timestamp with time zone default now(),
   department text default 'My Department', -- get from profile.department
