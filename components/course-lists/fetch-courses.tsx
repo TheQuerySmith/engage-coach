@@ -49,13 +49,22 @@ export default function CourseList() {
         <thead className="bg-gray-100">
           <tr>
         <th className="px-4 py-2 border border-gray-300">Title</th>
-        
+        <th className="px-4 py-2 border border-gray-300">Actions</th>
+
           </tr>
         </thead>
         <tbody className="bg-white">
           {courses.map((course) => (
         <tr key={course.id} className="hover:bg-gray-50">
           <td className="px-4 py-2 border border-gray-300">{course.title}</td>
+          <td className="px-4 py-2 border border-gray-300">
+            <Link
+              href={`/courses/${course.short_id}`}
+              className="text-blue-600 hover:underline"
+            >
+              View & Edit
+            </Link>
+          </td>
         </tr>
           ))}
         </tbody>

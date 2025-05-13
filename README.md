@@ -31,6 +31,7 @@ A full-stack web application to streamline the administration, delivery, and rep
 - [ ] Need to create user_checklist row when user is created
 - [ ] More efficient subcomponents? (e.g., redirect within fetch-next-steps.tsx)
 - [ ] middleware.ts should redirect to signin if not logged in (not just profile)
+- [ ] Ensure users can't change their profile.id or other locked fields
 
 ### Profile Schema
 
