@@ -30,6 +30,7 @@ A full-stack web application to streamline the administration, delivery, and rep
 - [ ] Update email doesn't update auth.users table
 - [ ] Need to create user_checklist row when user is created
 - [ ] More efficient subcomponents? (e.g., redirect within fetch-next-steps.tsx)
+- [ ] middleware.ts should redirect to signin if not logged in (not just profile)
 
 ### Profile Schema
 
@@ -86,6 +87,33 @@ create table user_checklist (
   completed_at      timestamptz,
   primary key (user_id, checklist_item_id)
 );
+
+create table courses (
+  id uuid primary key default gen_random_uuid(),
+  short_id text unique not null default substring(md5(random()::text), 1, 5),
+  instructor_id uuid not null references profiles(id) on delete cascade,
+  title text not null default 'My Course Title',
+  created_at timestamp with time zone default now(),
+  department text default 'My Department', -- get from profile.department
+  number_code text,
+  n_sections int default 1,
+  n_students int,
+  pct_majors int,
+  pct_STEM int,
+  general_education text check (general_education IN ('Yes','No','Unsure/Other')),
+  level text check (level IN ('Introductory Undergrade','Advanced Undergraduate','Graduate')),
+  type text default 'Lecture' check (type IN ('Lecture','Lab','Seminar/Discussion','Other')),
+  format text default 'In-Person' check (format IN ('In-Person','Online','Hybrid','Other')),
+  additional_info text,
+  pct_instructor_decision int,
+  pct_instructor_synchronous int,
+  pct_instructor_asynchronous int
+);
+
+-- NOTE: Need to allow NULL values on level/type/format: 
+-- e.g., format IS NULL OR format = ANY (ARRAY['In-Person'::text, 'Online'::text, 'Hybrid'::text, 'Other'::text])
+
+
 
 
 
