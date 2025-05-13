@@ -1,7 +1,8 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
-export default async function CourseDetails({ params }: { params: { short_id: string } }) {
+export default async function CourseDetails(props: { params: Promise<{ short_id: string }> }) {
+  const params = await props.params;
   const supabase = await createClient();
 
   const {
