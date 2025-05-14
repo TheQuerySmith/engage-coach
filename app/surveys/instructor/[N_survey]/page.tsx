@@ -45,9 +45,6 @@ export default function SurveyPage() {
       setUniqueLink(constructedLink);
     };
 
-    // Call the setup function on mount
-    setupSurveyLink();
-
     // Function to check if the user completed the survey
     const checkSurveyCompletion = async () => {
       const {
@@ -60,19 +57,41 @@ export default function SurveyPage() {
         return;
       }
 
-      // Check if the user's ID is in the qualtrics_instructor_responses table
-      const { data, error } = await supabase
-        .from('qualtrics_instructor_responses')
+      // First, fetch the survey to get its ID
+      const { data: surveyData, error: surveyError } = await supabase
+        .from('surveys')
         .select('id')
-        .eq('user_id', user.id)
+        .eq('name', this_survey_name)
         .single();
+
+      if (surveyError || !surveyData) {
+        console.error('Error fetching survey:', surveyError);
+        return;
+      }
+
+      // Check if the user's ID, survey_id, and survey_n are in the instructor_survey_responses table
+      const { data, error } = await supabase
+        .from('instructor_survey_responses')
+        .select('instructor_id')
+        .eq('instructor_id', user.id)
+        .eq('survey_id', surveyData.id)
+        .eq('survey_n', this_survey_n);
+
+      console.log("checkSurveyCompletion data:", data, "error:", error);
+
 
       if (error) {
         console.error('Error checking survey completion:', error);
-      } else if (data) {
+      } else if (data && data.length > 0) {
         setSurveyCompleted(true);
       }
     };
+
+    // Call the setup function, and setup if the survey is not completed
+    checkSurveyCompletion();
+    if (!surveyCompleted) {
+      setupSurveyLink();
+    }
 
     // Poll the survey completion status every 5 seconds
     const interval = setInterval(() => {
