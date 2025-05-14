@@ -5,9 +5,48 @@ import { createClient } from '@/utils/supabase/client';
 
 export default function SurveyPage() {
   const [surveyCompleted, setSurveyCompleted] = useState(false);
+  const [uniqueLink, setUniqueLink] = useState<string | null>(null);
   const supabase = createClient();
 
+  // Define the survey identifier variables
+  const this_survey_name = 'Instructor Personal Survey 2025';
+  const this_survey_n = 1;
+
   useEffect(() => {
+    // Function to construct the unique survey link
+    const setupSurveyLink = async () => {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        console.error('Error fetching user:', userError);
+        return;
+      }
+
+      // Query the surveys table for the given survey name
+      const { data: surveyData, error } = await supabase
+        .from('surveys')
+        .select('id, link')
+        .eq('name', this_survey_name)
+        .single();
+
+      if (error || !surveyData) {
+        console.error('Error fetching survey:', error);
+        return;
+      }
+
+      // Construct the unique survey link
+      // Format: [surveys.link]?instructor_id=[user.id]&survey_id=[surveyData.id]&survey_n=[this_survey_n]
+      const constructedLink = `${surveyData.link}?instructor_id=${user.id}&survey_id=${surveyData.id}&survey_n=${this_survey_n}`;
+      setUniqueLink(constructedLink);
+    };
+
+    // Call the setup function on mount
+    setupSurveyLink();
+
+    // Function to check if the user completed the survey
     const checkSurveyCompletion = async () => {
       const {
         data: { user },
@@ -19,7 +58,7 @@ export default function SurveyPage() {
         return;
       }
 
-      // Check if the user's ID is in the "qualtrics_instructor_responses" table
+      // Check if the user's ID is in the qualtrics_instructor_responses table
       const { data, error } = await supabase
         .from('qualtrics_instructor_responses')
         .select('id')
@@ -29,16 +68,16 @@ export default function SurveyPage() {
       if (error) {
         console.error('Error checking survey completion:', error);
       } else if (data) {
-        setSurveyCompleted(true); // Mark survey as completed
+        setSurveyCompleted(true);
       }
     };
 
-    // Poll the database every 5 seconds
+    // Poll the survey completion status every 5 seconds
     const interval = setInterval(() => {
       checkSurveyCompletion();
     }, 5000);
 
-    return () => clearInterval(interval); // Cleanup interval on component unmount
+    return () => clearInterval(interval);
   }, [supabase]);
 
   if (surveyCompleted) {
@@ -52,10 +91,18 @@ export default function SurveyPage() {
     );
   }
 
+  if (!uniqueLink) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+        <p>Loading survey...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
       <iframe
-        src="https://utexas.qualtrics.com/jfe/form/SV_b7PqMufNgIi0Jjo"
+        src={uniqueLink}
         title="Qualtrics Survey"
         className="w-screen h-screen border-none"
         allowFullScreen
