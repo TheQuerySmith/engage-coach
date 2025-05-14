@@ -11,6 +11,9 @@ A full-stack web application to streamline the administration, delivery, and rep
 | Milestone | Description | Status |
 |----------|-------------|--------|
 | ✅ Profile | Update profile upon signup | In Progress |
+| ✅ Courses | Create and view courses | In Progress |
+| ✅ Surveys | Create and view surveys | In Progress |
+
 
 
 ### 🛠️ Detailed Next steps
@@ -20,10 +23,11 @@ A full-stack web application to streamline the administration, delivery, and rep
  - [ ] User can upload a profile picture
  - [ ] User can upload a Bio  
  - [ ] User can upload a list of website links (social media, personal website, etc.)
+ - [ ] Allow instructors to upload a list of student IDs
+ - [ ] Create update tables function when updated (updated_at columns)
 
 
 ### Bug Fixes
-- [X] Fix the auto email linking
 - [ ] Toast messages don't leave the screen on profile update
 - [ ] Email address should be validated on profile update
 - [ ] Add supabase error handling 
@@ -32,6 +36,12 @@ A full-stack web application to streamline the administration, delivery, and rep
 - [ ] More efficient subcomponents? (e.g., redirect within fetch-next-steps.tsx)
 - [ ] middleware.ts should redirect to signin if not logged in (not just profile)
 - [ ] Ensure users can't change their profile.id or other locked fields
+- [ ] Trim and lowercase student ids for better matching
+
+### Decisions
+- [X] Do not store qualtrics survey data in the database; only whether the survey has been completed. This ensures that we are not duplicating data and that we are not storing sensitive information in our database.
+- [ ] Do we need overall instructor survey and course-specific?
+
 
 ### Profile Schema
 
@@ -109,6 +119,50 @@ create table courses (
   pct_instructor_decision int,
   pct_instructor_synchronous int,
   pct_instructor_asynchronous int
+);
+
+create table surveys (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  link text not null,
+  type text not null check (type IN ('Instructor','Student')),
+  start_date date default now(),
+  end_date date default now() + interval '6 month', 
+  created_at timestamp with time zone default now(),
+  updated_at timestamp with time zone default now()
+);
+
+create table instructor_survey_responses (
+  id uuid primary key default gen_random_uuid(),
+  instructor_id uuid not null references profiles(id) on delete cascade,
+  survey_id uuid not null references surveys(id) on delete cascade,
+  survey_N int not null,
+  status text not null default 'Not Started' check (status IN ('Not Started','In Progress','Completed')),
+  created_at timestamp with time zone default now(),
+  updated_at timestamp with time zone default now()
+);
+
+create table instructor_course_survey_responses (
+  id uuid primary key default gen_random_uuid(),
+  instructor_id uuid not null references profiles(id) on delete cascade,
+  course_id uuid not null references courses(id) on delete cascade,
+  survey_id uuid not null references surveys(id) on delete cascade,
+  survey_N int not null,
+  status text not null default 'Not Started' check (status IN ('Not Started','In Progress','Completed')),
+  created_at timestamp with time zone default now(),
+  updated_at timestamp with time zone default now()
+);
+
+create table student_course_survey_responses (
+  id uuid primary key default gen_random_uuid(),
+  student_id text not null default 'anonymous',
+  course_id uuid not null references courses(id) on delete cascade,
+  survey_id uuid not null references surveys(id) on delete cascade,
+  survey_N int not null,
+  status text not null default 'Not Started' check (status IN ('Not Started','In Progress','Completed')),
+  upload_source text not null default 'Survey' check (source IN ('Survey','Instructor')),
+  created_at timestamp with time zone default now(),
+  updated_at timestamp with time zone default now()
 );
 
 -- NOTE: Need to allow NULL values on level/type/format: 
