@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
 export default function SurveyPage() {
@@ -8,9 +9,10 @@ export default function SurveyPage() {
   const [uniqueLink, setUniqueLink] = useState<string | null>(null);
   const supabase = createClient();
 
-  // Define the survey identifier variables
+  // Extract N_survey from the URL and convert to a number
+  const params = useParams();
+  const this_survey_n = Number(params.N_survey);
   const this_survey_name = 'Instructor Personal Survey 2025';
-  const this_survey_n = 1;
 
   useEffect(() => {
     // Function to construct the unique survey link
@@ -78,7 +80,7 @@ export default function SurveyPage() {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [supabase]);
+  }, [supabase, this_survey_n, this_survey_name]);
 
   if (surveyCompleted) {
     return (
