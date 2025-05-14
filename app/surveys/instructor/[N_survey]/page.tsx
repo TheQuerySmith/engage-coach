@@ -77,13 +77,11 @@ export default function SurveyPage() {
         .eq('survey_id', surveyData.id)
         .eq('survey_n', this_survey_n);
 
-      console.log("checkSurveyCompletion data:", data, "error:", error);
-
-
       if (error) {
         console.error('Error checking survey completion:', error);
       } else if (data && data.length > 0) {
         setSurveyCompleted(true);
+        clearInterval(interval);
       }
     };
 
