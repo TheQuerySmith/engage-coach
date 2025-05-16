@@ -18,6 +18,7 @@ A full-stack web application to streamline the administration, delivery, and rep
 
 ### 🛠️ Detailed Next steps
  - [/] Create a profile page with next steps (upon signup) 
+ - [ ] Figure out file storage and report capabilities (https://supabase.com/docs/guides/storage/security/access-control) - user has file folder with user id
 
  ### Optional features
  - [ ] User can upload a profile picture
@@ -40,6 +41,7 @@ A full-stack web application to streamline the administration, delivery, and rep
 
 ### Decisions
 - [X] Do not store qualtrics survey data in the database; only whether the survey has been completed. This ensures that we are not duplicating data and that we are not storing sensitive information in our database.
+- [X] Reports should be generated locally allowing for team review and approval before being sent to instructors. Also simplifies data management. Instead, R script that uses public API to update report links and saves to file system.
 - [ ] Do we need overall instructor survey and course-specific?
 
 
