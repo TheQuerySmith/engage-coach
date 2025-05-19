@@ -19,8 +19,6 @@ A full-stack web application to streamline the administration, delivery, and rep
 ### 🛠️ Detailed Next steps
  - [ ] Separate profile next steps 
  - [ ] Add welcome message to profile page
- - [ ] Add profile summary to profile page (right side)
- - [ ] Remove default headers and footers from pages
  - [ ] Figure out file storage and report capabilities (https://supabase.com/docs/guides/storage/security/access-control) - user has file folder with user id
 
  ### Optional features
@@ -49,6 +47,7 @@ A full-stack web application to streamline the administration, delivery, and rep
 - [ ] In course add, weird 0 requirement when adding student numbers
 - [ ] Ensure non-overlapping survey windows
 - [ ] Gen-ed default of "Other"
+- [ ] Default survey open/close at midnight of local time
 
 ### Decisions
 - [X] Do not store qualtrics survey data in the database; only whether the survey has been completed. This ensures that we are not duplicating data and that we are not storing sensitive information in our database.
