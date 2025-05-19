@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import { createClient } from '@/utils/supabase/client';
 
 interface CourseFormProps {
@@ -28,6 +28,26 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
   const [pctInstructorSynchronous, setPctInstructorSynchronous] = useState(0);
   const [pctInstructorAsynchronous, setPctInstructorAsynchronous] = useState(0);
 
+  useEffect(() => {
+    async function fetchDepartment() {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (user && !userError) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('department')
+          .eq('id', user.id)
+          .single();
+        if (!error && data?.department) {
+          setDepartment(data.department);
+        }
+      }
+    }
+    fetchDepartment();
+  }, [supabase]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -49,7 +69,7 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
         n_sections: nSections,
         n_students: nStudents,
         pct_majors: pctMajors,
-        pct_STEM: pctSTEM,
+        pct_stem: pctSTEM,
         general_education: generalEducation,
         level: level,
         type: courseType,
@@ -179,7 +199,7 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
           className="accent-blue-600"
         />
       </label>
-      
+
       <hr className="my-8 border-t-2 border-gray-300" />
       <h2 className="text-2xl font-semibold mb-4">Student Population</h2>
       <label className="flex flex-col">
