@@ -114,7 +114,7 @@ create table courses (
   pct_majors int,
   pct_STEM int,
   general_education text check (general_education IN ('Yes','No','Unsure/Other')),
-  level text check (level IN ('Introductory Undergrade','Advanced Undergraduate','Graduate')),
+  level text check (level IN ('Introductory Undergrade','Advanced Undergraduate','Graduate','Other')),
   type text default 'Lecture' check (type IN ('Lecture','Lab','Seminar/Discussion','Other')),
   format text default 'In-Person' check (format IN ('In-Person','Online','Hybrid','Other')),
   additional_info text,
