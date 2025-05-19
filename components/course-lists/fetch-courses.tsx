@@ -11,7 +11,6 @@ export default function CourseList() {
   const router = useRouter();
   const supabase = createClient();
 
-
   useEffect(() => {
     const fetchCourses = async () => {
       const {
@@ -24,9 +23,10 @@ export default function CourseList() {
         return;
       }
 
+      // Updated query to include department and number_code
       const { data, error: fetchError } = await supabase
         .from('courses')
-        .select('title, short_id, id')
+        .select('title, short_id, id, department, number_code')
         .eq('user_id', user.id);
 
       if (fetchError) {
@@ -48,24 +48,27 @@ export default function CourseList() {
       <table className="min-w-full border-collapse border border-gray-300">
         <thead className="bg-gray-100">
           <tr>
-        <th className="px-4 py-2 border border-gray-300">Title</th>
-        <th className="px-4 py-2 border border-gray-300">Actions</th>
-
+            <th className="px-4 py-2 border border-gray-300">Title</th>
+            <th className="px-4 py-2 border border-gray-300">Actions</th>
           </tr>
         </thead>
         <tbody className="bg-white">
           {courses.map((course) => (
-        <tr key={course.id} className="hover:bg-gray-50">
-          <td className="px-4 py-2 border border-gray-300">{course.title}</td>
-          <td className="px-4 py-2 border border-gray-300">
-            <Link
-              href={`/courses/${course.short_id}`}
-              className="text-blue-600 hover:underline"
-            >
-              View & Edit
-            </Link>
-          </td>
-        </tr>
+            <tr key={course.id} className="hover:bg-gray-50">
+              <td className="px-4 py-2 border border-gray-300">
+                {/* Display title with (department number_code) appended */}
+                {course.title} (
+                {course.department} {course.number_code})
+              </td>
+              <td className="px-4 py-2 border border-gray-300">
+                <Link
+                  href={`/courses/${course.short_id}`}
+                  className="text-blue-600 hover:underline"
+                >
+                  View & Edit
+                </Link>
+              </td>
+            </tr>
           ))}
         </tbody>
       </table>
