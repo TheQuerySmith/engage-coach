@@ -67,24 +67,29 @@ export default function FetchSurveys() {
       <h2 className="text-xl font-bold mb-4 text-center">My Courses and Surveys</h2>
       {courses.map((course) => (
         <div key={course.id} className="mb-8">
-          <h3 className="text-lg font-semibold mb-2">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold mb-2">
+              <Link
+                href={`/courses/${course.short_id}`}
+                className="text-blue-600 hover:underline"
+              >
+                {course.title} ({course.department} {course.number_code})
+              </Link>
+            </h3>
             <Link
-              href={`/courses/${course.short_id}`}
-              className="text-blue-600 hover:underline"
+              href={`/courses/${course.short_id}/set-dates`}
+              className="text-sm text-blue-500 hover:underline"
             >
-              {course.title} ({course.department} {course.number_code})
+              Edit survey dates
             </Link>
-          </h3>
+          </div>
           <table className="min-w-full border-collapse border border-gray-300">
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-4 py-2 border border-gray-300">Survey</th>
-                <th className="px-4 py-2 border border-gray-300">
-                  Instructor Completed?
-                </th>
-                <th className="px-4 py-2 border border-gray-300">
-                  N Students Completed?
-                </th>
+                <th className="px-4 py-2 border border-gray-300">Instructor Survey</th>
+                <th className="px-4 py-2 border border-gray-300">Student Survey</th>
+                <th className="px-4 py-2 border border-gray-300">Report Links</th>
               </tr>
             </thead>
             <tbody>
@@ -144,6 +149,9 @@ export default function FetchSurveys() {
                       ) : (
                         <span className={studentColor}>{studentsCompleted}</span>
                       )}
+                    </td>
+                    <td className="px-4 py-2 border border-gray-300 text-center">
+                      Not yet available
                     </td>
                   </tr>
                 );

@@ -91,7 +91,7 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
       console.log("New course inserted:", newCourse);
       onSuccess("Course added successfully!");
       // Redirect to the newly created course details page using its short_id
-      router.push(`/courses/${newCourse.short_id}`);
+      router.push(`/courses/${newCourse.short_id}/set-dates`);
     } else {
       console.error("No data returned from insert", insertedCourses);
       alert("Course was added, but could not retrieve new course data.");

@@ -137,7 +137,7 @@ export default function CourseDetails() {
                       className="text-blue-600 hover:underline"
                       title="Copy to clipboard"
                     >
-                      Click here to copy to clipboard
+                      Click here to copy the student survey to clipboard
                     </button>
                   </p>
                   
