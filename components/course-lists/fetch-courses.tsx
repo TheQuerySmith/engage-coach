@@ -45,6 +45,11 @@ export default function CourseList() {
 
   return (
     <div>
+      {courses.length > 5 && (
+        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          You seem to have a lot of courses. You will receive a separate report for each course, so if you are teaching many similar courses, we recommend merging them so that you can better understand your student data.
+        </div>
+      )}
       <table className="min-w-full border-collapse border border-gray-300">
         <thead className="bg-gray-100">
           <tr>
