@@ -61,7 +61,7 @@ export default function CourseDetails() {
     if (windowData) {
       const openDate = new Date(windowData.open_at);
       const closeDate = new Date(windowData.close_at);
-      displayText = `Opens: ${openDate.toLocaleString()} - Closes: ${closeDate.toLocaleString()}`;
+      displayText = `${openDate.toLocaleDateString()} to ${closeDate.toLocaleDateString()}`;
     }
     return { survey_n, displayText };
   });
@@ -118,7 +118,7 @@ export default function CourseDetails() {
           {surveys.map((survey_n, index) => (
             <div key={survey_n} className="mb-6 border p-4 rounded text-center">
               <h3 className="text-lg font-semibold mb-2 text-center">Survey {survey_n}</h3>
-              <p className="mb-2">{surveyWindows[index].displayText}</p>
+              <p className="mb-2"><strong>Scheduled: </strong>{surveyWindows[index].displayText}</p>
               <div className="flex flex-col gap-2">
                 <div>
                   <p className="font-medium"><strong>Instructor Survey Link:</strong>{' '}

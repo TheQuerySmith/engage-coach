@@ -95,13 +95,14 @@ export default function SetDatesPage() {
       // so we provide a dummy UUID. In your schema, you may determine the correct survey_id.
       const { error } = await supabase
         .from('course_survey_windows')
-        .upsert({
-          course_id: course.id,
-          survey_n: survey_n,
+        .update({
           open_at: new Date(windowData.open_at).toISOString(),
           close_at: new Date(windowData.close_at).toISOString(),
-          survey_id: course.survey_id || '00000000-0000-0000-0000-000000000000'
-        }, { onConflict: 'course_id,survey_n' });
+        })
+        .match({
+          course_id: course.id,
+          survey_n: survey_n
+                });
       if (error) {
         setError(error.message);
         setSaving(false);
@@ -109,7 +110,7 @@ export default function SetDatesPage() {
       }
     }
     setSaving(false);
-    alert('Survey dates updated successfully!');
+    router.push(`/courses/${short_id}`);
   };
 
   if (loading) return <p>Loading...</p>;
@@ -121,8 +122,9 @@ export default function SetDatesPage() {
   const qualtricsBase = "https://utexas.qualtrics.com/jfe/form/SV_b7PqMufNgIi0Jjo";
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Set Survey Dates &amp; Get Survey Links for: {course.title}</h1>
-      
+      <h1 className="text-2xl font-bold mb-4">{course.title}</h1>
+      <h2 className="text-lg font-semibold mb-4">Update Survey Dates</h2>
+
       <form onSubmit={handleSubmit} className="mb-8">
         {[1, 2].map((survey_n) => (
           <div key={survey_n} className="mb-4 border p-4 rounded">
@@ -155,35 +157,6 @@ export default function SetDatesPage() {
           {saving ? 'Saving...' : 'Save Survey Dates'}
         </button>
       </form>
-
-      <hr className="my-8" />
-
-      <h2 className="text-xl font-bold mb-4">Survey Links</h2>
-      {[1, 2].map((survey_n) => {
-        // Instructor link: internal route (adjust as needed for your app)
-        const instructorLink = `/surveys/instructor/${survey_n}?course_id=${course.id}`;
-        // Student link: External Qualtrics URL with query parameters
-        const studentLink = `${qualtricsBase}?course_id=${course.id}&survey_n=${survey_n}`;
-        return (
-          <div key={survey_n} className="mb-6">
-            <h3 className="text-lg font-semibold">Survey {survey_n}</h3>
-            <div className="flex flex-col gap-2">
-              <div>
-                <p className="font-medium">Instructor Survey Link:</p>
-                <Link href={instructorLink} className="text-blue-600 hover:underline">
-                  {instructorLink}
-                </Link>
-              </div>
-              <div>
-                <p className="font-medium">Student Survey Link:</p>
-                <a href={studentLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                  {studentLink}
-                </a>
-              </div>
-            </div>
-          </div>
-        );
-      })}
     </div>
   );
 }

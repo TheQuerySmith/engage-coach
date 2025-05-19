@@ -31,6 +31,9 @@ A full-stack web application to streamline the administration, delivery, and rep
  - [ ] Create update tables function when updated (updated_at columns)
  - [ ] Make tabs mimic Canvas
  - [ ] If courses are deleted, change to inactive rather than delete
+ - [ ] Currently set up for only two survey window: need to drastically update database etc. to allow for multiple survey windows
+ - [ ] Added shortcut of adding 8 weeks to second survey window defaults within supabase function
+ - [ ] Pre-course Survey
 
 
 ### Bug Fixes
@@ -44,6 +47,8 @@ A full-stack web application to streamline the administration, delivery, and rep
 - [ ] Ensure users can't change their profile.id or other locked fields
 - [ ] Trim and lowercase student ids for better matching
 - [ ] In course add, weird 0 requirement when adding student numbers
+- [ ] Ensure non-overlapping survey windows
+- [ ] Gen-ed default of "Other"
 
 ### Decisions
 - [X] Do not store qualtrics survey data in the database; only whether the survey has been completed. This ensures that we are not duplicating data and that we are not storing sensitive information in our database.
