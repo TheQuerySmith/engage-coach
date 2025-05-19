@@ -29,6 +29,8 @@ export default function FetchSurveys() {
         .select(`
           id,
           title,
+          department,
+          number_code,
           short_id,
           instructor_course_survey_responses (
             survey_n,
@@ -62,7 +64,7 @@ export default function FetchSurveys() {
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-bold mb-4">Course Surveys</h2>
+      <h2 className="text-xl font-bold mb-4 text-center">My Courses and Surveys</h2>
       {courses.map((course) => (
         <div key={course.id} className="mb-8">
           <h3 className="text-lg font-semibold mb-2">
@@ -70,7 +72,7 @@ export default function FetchSurveys() {
               href={`/courses/${course.short_id}`}
               className="text-blue-600 hover:underline"
             >
-              {course.title}
+              {course.title} ({course.department} {course.number_code})
             </Link>
           </h3>
           <table className="min-w-full border-collapse border border-gray-300">

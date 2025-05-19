@@ -1,7 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
-import CourseList from "@/components/course-lists/fetch-courses";
 import Link from "next/link";
 import SurveyList from "@/components/course-lists/fetch-surveys";
 
@@ -25,7 +24,6 @@ export default async function ProtectedPage() {
           user
         </div>
       </div>
-      <CourseList />
       <SurveyList />
       <div className="text-center">
       <Link href="/courses/add-course">
