@@ -31,10 +31,6 @@ export default async function ProfilePage() {
 
   return (
     <div className="max-w-xl mx-auto p-6">
-      {/* Create Go to Homepage button */}
-      <Link href="/../profile" className="text-blue-500 hover:underline mb-4">
-        &larr; Go to Homepage
-      </Link>
       <h1 className="flex justify-center text-2xl font-semibold mb-4">My Profile</h1>
       
       <div className="grid grid-cols-1 gap-4">

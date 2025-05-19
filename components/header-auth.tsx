@@ -62,7 +62,7 @@ export default async function AuthButton() {
   return user ? (
     <div className="flex items-center gap-4">
 
-      <Link href="/dashboard">
+      <Link href="/profile">
         <Button
           variant={"ghost"}
           size="sm"
