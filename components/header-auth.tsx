@@ -61,12 +61,6 @@ export default async function AuthButton() {
   }
   return user ? (
     <div className="flex items-center gap-4">
-      <Link href="/profile" className="font-normal hover:text-blue-500">
-        Survey Links
-      </Link>
-      <Link href="/profile" className="font-normal hover:text-blue-500">
-        Reports
-      </Link>
 
       <Link href="/dashboard">
         <Button
