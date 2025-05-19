@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
+import AddNotification from "@/components/ui/notification-ribbon";
 
 export default function SetDatesPage() {
   const router = useRouter();
@@ -127,26 +128,41 @@ export default function SetDatesPage() {
 
       <form onSubmit={handleSubmit} className="mb-8">
         {[1, 2].map((survey_n) => (
-          <div key={survey_n} className="mb-4 border p-4 rounded">
-            <h2 className="text-xl font-semibold mb-2">Survey {survey_n}</h2>
-            <label className="block mb-2">
-              Open At:
-              <input 
-                type="datetime-local"
-                value={surveyWindows[survey_n]?.open_at || ''}
-                onChange={(e) => handleChange(survey_n, 'open_at', e.target.value)}
-                className="border p-2 rounded w-full"
+          <div key={survey_n}>
+            <div className="mb-4 border p-4 rounded">
+              <h2 className="text-xl font-semibold mb-2">Survey {survey_n}</h2>
+              {survey_n === 1 && (
+              <AddNotification 
+                message="Select when you and your students will complete Survey 1. We recommend opening the survey after students receive their grades back from their first exam or major assignment and closing the survey approximately 1 week later."
+                type="info" 
               />
-            </label>
-            <label className="block mb-2">
-              Close At:
-              <input 
-                type="datetime-local"
-                value={surveyWindows[survey_n]?.close_at || ''}
-                onChange={(e) => handleChange(survey_n, 'close_at', e.target.value)}
-                className="border p-2 rounded w-full"
+            )}
+            {survey_n === 2 && (
+              <AddNotification 
+                message="Select when you and your students will complete Survey 2. We recommend opening the survey near the last meeting time and closing the survey approximately 1 week later (at least a few days before finals)."
+                type="info" 
               />
-            </label>
+            )}
+
+              <label className="block mb-2">
+                Open At:
+                <input 
+                  type="datetime-local"
+                  value={surveyWindows[survey_n]?.open_at || ''}
+                  onChange={(e) => handleChange(survey_n, 'open_at', e.target.value)}
+                  className="border p-2 rounded w-full"
+                />
+              </label>
+              <label className="block mb-2">
+                Close At:
+                <input 
+                  type="datetime-local"
+                  value={surveyWindows[survey_n]?.close_at || ''}
+                  onChange={(e) => handleChange(survey_n, 'close_at', e.target.value)}
+                  className="border p-2 rounded w-full"
+                />
+              </label>
+            </div>
           </div>
         ))}
         <button 
