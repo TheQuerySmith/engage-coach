@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect} from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
 interface CourseFormProps {
@@ -8,6 +9,7 @@ interface CourseFormProps {
 }
 
 export default function CourseForm({ onSuccess }: CourseFormProps) {
+  const router = useRouter();
   const supabase = createClient();
 
   // Course fields based on the schema
@@ -60,7 +62,7 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
       return;
     }
 
-    const { error } = await supabase.from('courses').insert([
+    const { error, data: insertedCourses } = await supabase.from('courses').insert([
       {
         user_id: user.id,
         title,
@@ -79,28 +81,21 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
         pct_instructor_synchronous: pctInstructorSynchronous,
         pct_instructor_asynchronous: pctInstructorAsynchronous,
       },
-    ]);
+    ])
+    .select('*');
 
     if (error) {
-      alert('Error adding course: ' + error.message);
+      alert("Error adding course: " + error.message);
+    } else if (insertedCourses && insertedCourses.length > 0) {
+      const newCourse = insertedCourses[0];
+      console.log("New course inserted:", newCourse);
+      onSuccess("Course added successfully!");
+      // Redirect to the newly created course details page using its short_id
+      router.push(`/courses/${newCourse.short_id}`);
     } else {
-      onSuccess('Course added successfully!');
-      // Reset the form fields
-      setTitle('');
-      setDepartment('');
-      setNumberCode('');
-      setNSections(1);
-      setNStudents(0);
-      setPctMajors(0);
-      setPctSTEM(0);
-      setGeneralEducation('Other');
-      setLevel('Other');
-      setCourseType('Lecture');
-      setFormat('In-Person');
-      setAdditionalInfo('');
-      setPctInstructorDecision(0);
-      setPctInstructorSynchronous(0);
-      setPctInstructorAsynchronous(0);
+      console.error("No data returned from insert", insertedCourses);
+      alert("Course was added, but could not retrieve new course data.");
+      router.push("/courses");
     }
   };
 
