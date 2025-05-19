@@ -53,25 +53,23 @@ export default function CourseList() {
       <table className="min-w-full border-collapse border border-gray-300">
         <thead className="bg-gray-100">
           <tr>
-            <th className="px-4 py-2 border border-gray-300">Title</th>
-            <th className="px-4 py-2 border border-gray-300">Actions</th>
+            <th className="px-4 py-2 border border-gray-300">Title (Click for details)</th>
+            <th className="px-4 py-2 border border-gray-300">Next Survey Dates</th>
           </tr>
         </thead>
         <tbody className="bg-white">
           {courses.map((course) => (
             <tr key={course.id} className="hover:bg-gray-50">
               <td className="px-4 py-2 border border-gray-300">
-                {/* Display title with (department number_code) appended */}
-                {course.title} (
-                {course.department} {course.number_code})
-              </td>
-              <td className="px-4 py-2 border border-gray-300">
                 <Link
                   href={`/courses/${course.short_id}`}
-                  className="text-blue-600 hover:underline"
+                  className="hover:underline"
                 >
-                  View & Edit
+                  {course.title} ({course.department} {course.number_code})
                 </Link>
+              </td>
+              <td className="px-4 py-2 border border-gray-300">
+
               </td>
             </tr>
           ))}
