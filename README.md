@@ -17,7 +17,10 @@ A full-stack web application to streamline the administration, delivery, and rep
 
 
 ### 🛠️ Detailed Next steps
- - [/] Create a profile page with next steps (upon signup) 
+ - [ ] Separate profile next steps 
+ - [ ] Add welcome message to profile page
+ - [ ] Add profile summary to profile page (right side)
+ - [ ] Remove default headers and footers from pages
  - [ ] Figure out file storage and report capabilities (https://supabase.com/docs/guides/storage/security/access-control) - user has file folder with user id
 
  ### Optional features
@@ -26,6 +29,8 @@ A full-stack web application to streamline the administration, delivery, and rep
  - [ ] User can upload a list of website links (social media, personal website, etc.)
  - [ ] Allow instructors to upload a list of student IDs
  - [ ] Create update tables function when updated (updated_at columns)
+ - [ ] Make tabs mimic Canvas
+ - [ ] If courses are deleted, change to inactive rather than delete
 
 
 ### Bug Fixes
@@ -38,6 +43,7 @@ A full-stack web application to streamline the administration, delivery, and rep
 - [ ] middleware.ts should redirect to signin if not logged in (not just profile)
 - [ ] Ensure users can't change their profile.id or other locked fields
 - [ ] Trim and lowercase student ids for better matching
+- [ ] In course add, weird 0 requirement when adding student numbers
 
 ### Decisions
 - [X] Do not store qualtrics survey data in the database; only whether the survey has been completed. This ensures that we are not duplicating data and that we are not storing sensitive information in our database.
@@ -138,7 +144,7 @@ create table instructor_survey_responses (
   id uuid primary key default gen_random_uuid(),
   instructor_id uuid not null references profiles(id) on delete cascade,
   survey_id uuid not null references surveys(id) on delete cascade,
-  survey_N int not null,
+  survey_n int not null,
   status text not null default 'Not Started' check (status IN ('Not Started','In Progress','Completed')),
   created_at timestamp with time zone default now(),
   updated_at timestamp with time zone default now()
@@ -149,7 +155,7 @@ create table instructor_course_survey_responses (
   instructor_id uuid not null references profiles(id) on delete cascade,
   course_id uuid not null references courses(id) on delete cascade,
   survey_id uuid not null references surveys(id) on delete cascade,
-  survey_N int not null,
+  survey_n int not null,
   status text not null default 'Not Started' check (status IN ('Not Started','In Progress','Completed')),
   created_at timestamp with time zone default now(),
   updated_at timestamp with time zone default now()
@@ -160,12 +166,34 @@ create table student_course_survey_responses (
   student_id text not null default 'anonymous',
   course_id uuid not null references courses(id) on delete cascade,
   survey_id uuid not null references surveys(id) on delete cascade,
-  survey_N int not null,
+  survey_n int not null,
   status text not null default 'Not Started' check (status IN ('Not Started','In Progress','Completed')),
   upload_source text not null default 'Survey' check (source IN ('Survey','Instructor')),
   created_at timestamp with time zone default now(),
   updated_at timestamp with time zone default now()
 );
+
+-- When a particular survey is available in a particular course
+create table course_survey_windows (
+  id           bigserial primary key,
+  course_id    uuid  not null
+               references courses(id) on delete cascade,
+  survey_id    uuid  not null
+               references surveys(id) on delete cascade,
+  survey_n     int   not null,                       -- 1, 2, 3 … per course
+  open_at      timestamptz not null,
+  close_at     timestamptz not null,
+  constraint chk_window  check (open_at < close_at),
+
+  -- Keep the same survey from being scheduled twice for the same “N”
+  unique (course_id, survey_n, survey_id)
+);
+
+-- Fast look-ups for “what’s open right now?”
+create index on course_survey_windows (course_id, open_at, close_at);
+create index on course_survey_windows (survey_id, open_at, close_at);
+
+
 
 -- NOTE: Need to allow NULL values on level/type/format: 
 -- e.g., format IS NULL OR format = ANY (ARRAY['In-Person'::text, 'Online'::text, 'Hybrid'::text, 'Other'::text])

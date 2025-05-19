@@ -23,8 +23,7 @@ export default function FetchSurveys() {
         return;
       }
 
-      // Fetch courses along with linked instructor survey responses.
-      // The join uses the table "instructor_course_survey_responses" as defined in your README.
+      // Fetch courses along with linked instructor responses, survey windows, and student responses.
       const { data, error: fetchError } = await supabase
         .from('courses')
         .select(`
@@ -32,6 +31,15 @@ export default function FetchSurveys() {
           title,
           short_id,
           instructor_course_survey_responses (
+            survey_n,
+            status
+          ),
+          course_survey_windows (
+            survey_n,
+            open_at,
+            close_at
+          ),
+          student_course_survey_responses (
             survey_n,
             status
           )
@@ -55,51 +63,93 @@ export default function FetchSurveys() {
   return (
     <div className="p-6">
       <h2 className="text-xl font-bold mb-4">Course Surveys</h2>
-      <table className="min-w-full border-collapse border border-gray-300">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="px-4 py-2 border border-gray-300">Course Title</th>
-            <th className="px-4 py-2 border border-gray-300">Survey 1 Completed</th>
-            <th className="px-4 py-2 border border-gray-300">Survey 2 Completed</th>
-            <th className="px-4 py-2 border border-gray-300">Actions</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white">
-          {courses.map((course) => {
-            // Get the instructor survey responses for survey 1 and survey 2.
-            const responses = course.instructor_course_survey_responses || [];
-            const survey1 = responses.find((r: any) => r.survey_n === 1);
-            const survey2 = responses.find((r: any) => r.survey_n === 2);
-
-            console.log('Course:', course);
-            console.log('Responses:', responses);
-
-            return (
-              <tr key={course.id} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border border-gray-300">
-                  <Link href={`/courses/${course.short_id}`} className="text-blue-600 hover:underline">
-                    {course.title}
-                  </Link>
-                </td>
-                <td className="px-4 py-2 border border-gray-300 text-center">
-                  {survey1 && survey1.status === "Completed" ? "Yes" : "No"}
-                </td>
-                <td className="px-4 py-2 border border-gray-300 text-center">
-                  {survey2 && survey2.status === "Completed" ? "Yes" : "No"}
-                </td>
-                <td className="px-4 py-2 border border-gray-300">
-                  <Link
-                    href={`/courses/${course.short_id}/survey`}
-                    className="text-blue-600 hover:underline"
-                  >
-                    View/Complete Surveys
-                  </Link>
-                </td>
+      {courses.map((course) => (
+        <div key={course.id} className="mb-8">
+          <h3 className="text-lg font-semibold mb-2">
+            <Link
+              href={`/courses/${course.short_id}`}
+              className="text-blue-600 hover:underline"
+            >
+              {course.title}
+            </Link>
+          </h3>
+          <table className="min-w-full border-collapse border border-gray-300">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-4 py-2 border border-gray-300">Survey</th>
+                <th className="px-4 py-2 border border-gray-300">
+                  Instructor Completed?
+                </th>
+                <th className="px-4 py-2 border border-gray-300">
+                  N Students Completed?
+                </th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {[1, 2].map((survey_n) => {
+                // Get the survey window information for this survey number.
+                const windowData = course.course_survey_windows?.find(
+                  (w: any) => w.survey_n === survey_n
+                );
+                const now = new Date();
+                let openInfo = '';
+                if (windowData) {
+                  const openDate = new Date(windowData.open_at);
+                  if (now < openDate) {
+                    openInfo = `Opens ${openDate.toLocaleDateString()}`;
+                  }
+                }
+                // Get instructor's response.
+                const instResp = course.instructor_course_survey_responses?.find(
+                  (r: any) => r.survey_n === survey_n
+                );
+                const instructorCompleted =
+                  instResp && instResp.status === 'Completed' ? 'Yes' : 'No';
+                // Count student completions.
+                const studentsCompleted =
+                  course.student_course_survey_responses?.filter(
+                    (r: any) =>
+                      r.survey_n === survey_n && r.status === 'Completed'
+                  ).length || 0;
+
+                // Determine text color for instructor and student responses
+                const instructorColor = !openInfo
+                  ? instructorCompleted === 'Yes'
+                    ? 'text-green-600'
+                    : 'text-red-600'
+                  : '';
+                const studentColor = !openInfo
+                  ? studentsCompleted < 12
+                    ? 'text-red-600'
+                    : 'text-green-600'
+                  : '';
+
+                return (
+                  <tr key={survey_n} className="hover:bg-gray-50">
+                    <td className="px-4 py-2 border border-gray-300">
+                      {`Survey ${survey_n}`}
+                    </td>
+                    <td className="px-4 py-2 border border-gray-300 text-center">
+                      {openInfo ? (
+                        openInfo
+                      ) : (
+                        <span className={instructorColor}>{instructorCompleted}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 border border-gray-300 text-center">
+                      {openInfo ? (
+                        openInfo
+                      ) : (
+                        <span className={studentColor}>{studentsCompleted}</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      ))}
     </div>
   );
 }
