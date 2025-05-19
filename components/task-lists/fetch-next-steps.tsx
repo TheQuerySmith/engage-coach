@@ -147,17 +147,19 @@ const supabase = await createClient();
         {displayCompleteSurveySection ? (
           <>
             <h2 className="font-bold text-2xl">Survey 1</h2>
+            <p>
+                Your student surveys are now open! Head over to the{" "}
+                <a href="/courses" className="font-bold hover:underline">
+                Courses and Surveys
+              </a> page to find survey links for each course. 
+              </p>
             <TutorialStep 
               title="Send out student surveys" 
               type="surveys" 
               checked={completedMap.get("student_surveys") ?? false}
             >
-              <p>
-                Your student surveys are now open! Head over to the{" "}
-                <a href="/courses" className="font-bold hover:underline">
-                Courses and Surveys Page
-              </a> to find the links to your student surveys. Once at least 12 students have completed the survey, this item will be marked as complete, or you can complete it yourself.
-              </p>
+              <p>Once at least 12 students in active courses have completed the survey, this item will be marked as complete, or you can mark it complete yourself.</p>
+              
             </TutorialStep>
 
             <TutorialStep 
@@ -166,10 +168,7 @@ const supabase = await createClient();
               checked={completedMap.get("instructor_surveys") ?? false}
             >
               <p>
-                You can now complete your instructor! Head over to the{" "}
-                <a href="/courses" className="font-bold hover:underline">
-                Courses and Surveys Page
-              </a> to find the instructor links for each course. Once you have complete the survey, this item will be marked as complete.
+                Once you have complete surveys for all active courses, this item will be marked as complete.
               </p>
             </TutorialStep>
           </>
@@ -177,7 +176,7 @@ const supabase = await createClient();
 
         <h2 className="font-bold text-2xl">Check out the community and resources</h2>
 
-        <TutorialStep title="Introduce yourself to the community" type="resources" checked={completedMap.get("posted_community") ?? false} >
+        <TutorialStep title="Introduce yourself to the community" stepType="resources" checked={completedMap.get("posted_community") ?? false} >
           <p>
             Head over to the{" "}
             <a
