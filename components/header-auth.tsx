@@ -68,7 +68,7 @@ export default async function AuthButton() {
         Reports
       </Link>
 
-      <Link href="/profile">
+      <Link href="/dashboard">
         <Button
           variant={"ghost"}
           size="sm"
