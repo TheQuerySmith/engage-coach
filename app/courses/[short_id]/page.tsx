@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import DeleteCourse from '@/components/course-lists/DeleteCourse';
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import CopyButton from '@/components/CopyButton';
 
 
 export default function CourseDetails() {
@@ -129,16 +130,7 @@ export default function CourseDetails() {
                 </div>
                 <div>
                   <p className="font-medium"><strong>Student Survey Link:</strong>{' '}
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(studentLinks[index]);
-                        toast.success("Copied to clipboard!");
-                      }}
-                      className="text-blue-600 hover:underline"
-                      title="Copy to clipboard"
-                    >
-                      Click here to copy the student survey to clipboard
-                    </button>
+                    <CopyButton copyText={studentLinks[index]} buttonLabel= "Click here to copy the student survey to clipboard" />
                   </p>
                   
                     <details>
