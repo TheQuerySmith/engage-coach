@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import DeleteCourse from '@/components/course-lists/DeleteCourse';
-import { ToastContainer } from "react-toastify";
 import CopyButton from '@/components/CopyButton';
 
 
@@ -154,7 +153,6 @@ export default function CourseDetails() {
       <div className="mt-6 flex items-center gap-4">
         <DeleteCourse courseId={course.id} />
       </div>
-      <ToastContainer position="bottom-right" autoClose={1500} limit={3} />
     </div>
   );
 }
