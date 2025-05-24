@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
 import CourseForm from './CourseForm';
 
 export default function AddCoursePage() {
