@@ -121,12 +121,10 @@ export default async function FetchSurveys() {
                   : '';
 
                 // Construct dynamic survey links.
-                // For instructor survey, assume an internal link.
+                // For instructor survey, construct an internal link.
                 const instructorSurveyLink =
-                  currentUser && instructorBase
-                    ? `/surveys/instructor/${survey_n}?course_id=${course.id}`
-                    : '';
-                // For student survey, use the fetched studentBase to construct the external link.
+                  `/courses/${course.short_id}/instructor-survey/${survey_n}`;
+                // For student survey, use the fetched studentBase.
                 const studentSurveyLink = studentBase
                   ? `${studentBase}?course_id=${course.id}&survey_n=${survey_n}`
                   : '';
