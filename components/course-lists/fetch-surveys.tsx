@@ -4,24 +4,29 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
+import CopyButton from '@/components/CopyButton';
 
 export default function FetchSurveys() {
   const [courses, setCourses] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [instructorBase, setInstructorBase] = useState<string>('');
+  const [studentBase, setStudentBase] = useState<string>('');
   const router = useRouter();
   const supabase = createClient();
 
+  // Fetch user and survey records for instructor and student surveys.
   useEffect(() => {
     const fetchSurveyData = async () => {
       const {
         data: { user },
         error: userError,
       } = await supabase.auth.getUser();
-
       if (userError || !user) {
         router.push('/sign-in');
         return;
       }
+      setCurrentUser(user);
 
       // Fetch courses along with linked instructor responses, survey windows, and student responses.
       const { data, error: fetchError } = await supabase
@@ -32,19 +37,9 @@ export default function FetchSurveys() {
           department,
           number_code,
           short_id,
-          instructor_course_survey_responses (
-            survey_n,
-            status
-          ),
-          course_survey_windows (
-            survey_n,
-            open_at,
-            close_at
-          ),
-          student_course_survey_responses (
-            survey_n,
-            status
-          )
+          instructor_course_survey_responses ( survey_n, status ),
+          course_survey_windows ( survey_n, open_at, close_at ),
+          student_course_survey_responses ( survey_n, status )
         `)
         .eq('user_id', user.id);
 
@@ -55,7 +50,34 @@ export default function FetchSurveys() {
       }
     };
 
+    // Fetch survey base links from the surveys table.
+    const fetchSurveyRecords = async () => {
+      // Fetch instructor survey record (make sure survey name matches your DB)
+      const { data: instData, error: instError } = await supabase
+        .from('surveys')
+        .select('link')
+        .eq('name', 'Instructor Personal Survey 2025')
+        .single();
+      if (!instError && instData) {
+        setInstructorBase(instData.link);
+      } else {
+        console.error('Error fetching instructor survey record:', instError);
+      }
+      // Fetch student survey record (ensure survey name matches your DB)
+      const { data: studData, error: studError } = await supabase
+        .from('surveys')
+        .select('link')
+        .eq('name', 'Student Course Survey 2025')
+        .single();
+      if (!studError && studData) {
+        setStudentBase(studData.link);
+      } else {
+        console.error('Error fetching student survey record:', studError);
+      }
+    };
+
     fetchSurveyData();
+    fetchSurveyRecords();
   }, [router, supabase]);
 
   if (error) {
@@ -94,7 +116,7 @@ export default function FetchSurveys() {
             </thead>
             <tbody>
               {[1, 2].map((survey_n) => {
-                // Get the survey window information for this survey number.
+                // Get survey window info.
                 const windowData = course.course_survey_windows?.find(
                   (w: any) => w.survey_n === survey_n
                 );
@@ -106,12 +128,14 @@ export default function FetchSurveys() {
                     openInfo = `Opens ${openDate.toLocaleDateString()}`;
                   }
                 }
-                // Get instructor's response.
+                // Get instructor response.
                 const instResp = course.instructor_course_survey_responses?.find(
                   (r: any) => r.survey_n === survey_n
                 );
                 const instructorCompleted =
-                  instResp && instResp.status === 'Completed' ? 'Yes' : 'No';
+                  instResp && instResp.status === 'Completed'
+                    ? 'Completed'
+                    : 'Not Completed';
                 // Count student completions.
                 const studentsCompleted =
                   course.student_course_survey_responses?.filter(
@@ -119,9 +143,9 @@ export default function FetchSurveys() {
                       r.survey_n === survey_n && r.status === 'Completed'
                   ).length || 0;
 
-                // Determine text color for instructor and student responses
+                // Determine text colors.
                 const instructorColor = !openInfo
-                  ? instructorCompleted === 'Yes'
+                  ? instructorCompleted === 'Completed'
                     ? 'text-green-600'
                     : 'text-red-600'
                   : '';
@@ -129,6 +153,17 @@ export default function FetchSurveys() {
                   ? studentsCompleted < 12
                     ? 'text-red-600'
                     : 'text-green-600'
+                  : '';
+
+                // Construct dynamic survey links:
+                // For instructor survey, use the fetched instructorBase along with parameters.
+                const instructorSurveyLink =
+                  currentUser && instructorBase
+                    ? `/surveys/instructor/${survey_n}?course_id=${course.id}`
+                    : '';
+                // For student survey, use the fetched studentBase.
+                const studentSurveyLink = studentBase
+                  ? `${studentBase}?course_id=${course.id}&survey_n=${survey_n}`
                   : '';
 
                 return (
@@ -140,14 +175,33 @@ export default function FetchSurveys() {
                       {openInfo ? (
                         openInfo
                       ) : (
-                        <span className={instructorColor}>{instructorCompleted}</span>
+                        <span className={instructorColor}>
+                          {instructorCompleted}{' '}
+                          {instructorCompleted === 'Not Completed' && (
+                            <Link
+                              href={instructorSurveyLink}
+                              className="text-blue-500 hover:underline"
+                            >
+                              (LINK)
+                            </Link>
+                          )}
+                        </span>
                       )}
                     </td>
                     <td className="px-4 py-2 border border-gray-300 text-center">
                       {openInfo ? (
                         openInfo
                       ) : (
-                        <span className={studentColor}>{studentsCompleted}</span>
+                        <span className={studentColor}>
+                          {studentsCompleted}{' '}
+                            <Link
+                              href={studentSurveyLink}
+                              className="text-blue-500 hover:underline"
+                              target="_blank" rel="noopener noreferrer"
+                            >
+                              (LINK)
+                            </Link>
+                        </span>
                       )}
                     </td>
                     <td className="px-4 py-2 border border-gray-300 text-center">

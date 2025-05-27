@@ -34,6 +34,7 @@ A full-stack web application to streamline the administration, delivery, and rep
  - [ ] Pre-course Survey
  - [ ] Steps dashboard to add next steps: pull directly from database
  - [ ] Add cslx to steps for conditional formatting?
+ - [ ] Change survey primary key to short_id to make urls shorter
 
 
 ### Bug Fixes
