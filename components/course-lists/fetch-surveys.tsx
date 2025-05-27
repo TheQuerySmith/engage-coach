@@ -56,7 +56,7 @@ export default function FetchSurveys() {
       const { data: instData, error: instError } = await supabase
         .from('surveys')
         .select('link')
-        .eq('name', 'Instructor Personal Survey 2025')
+        .eq('name', 'Instructor Baseline Survey 2025')
         .single();
       if (!instError && instData) {
         setInstructorBase(instData.link);
