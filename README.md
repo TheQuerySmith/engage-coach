@@ -52,6 +52,7 @@ A full-stack web application to streamline the administration, delivery, and rep
 - [ ] Ensure non-overlapping survey windows
 - [ ] Gen-ed default of "Other"
 - [ ] Default survey open/close at midnight of local time
+- [ ] Create and edit courses should have explaination and correct dropdowns
 
 ### Refactoring
 - [ ] Remove unnessary effects
