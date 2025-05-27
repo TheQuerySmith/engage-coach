@@ -50,7 +50,7 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
   // Fetch survey links using the helper function
   const instPromises = surveys.map((survey_n) =>
     getSurveyLink({
-      surveyName: 'Instructor Personal Survey 2025',
+      surveyName: 'Instructor Course Survey 2025',
       surveyN: survey_n,
       instructorId: user.id,
       courseId: course.id,

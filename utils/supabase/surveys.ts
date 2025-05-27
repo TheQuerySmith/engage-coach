@@ -13,21 +13,25 @@ export async function getSurveyLink({
   instructorId,
   courseId,
 }: getSurveyLinkParams): Promise<string> {
-  // Await the client since createClient returns a promise.
   const supabase = await createClient();
 
-  const { data: surveyData, error } = await supabase
+  // Fetch the survey record
+  const { data: surveyData, error: surveyError } = await supabase
     .from('surveys')
     .select('id, link')
     .eq('name', surveyName)
     .single();
 
-  if (error || !surveyData) {
-    throw new Error(`Error fetching survey: ${error?.message}`);
+  if (surveyError || !surveyData) {
+    throw new Error(`Error fetching survey: ${surveyError?.message}`);
+  }
+
+  let courseParam = '';
+  if (courseId) {
+    courseParam = `&course_id=${courseId}`;
   }
 
   const instructorParam = instructorId ? `instructor_id=${instructorId}&` : '';
-  const courseParam = courseId ? `&course_id=${courseId}` : '';
-  const constructedLink = `${surveyData.link}?${instructorParam}survey_id=${surveyData.id}${courseParam}&survey_n=${surveyN}`;
+  const constructedLink = `${surveyData.link}?${instructorParam}${courseParam}&survey_n=${surveyN}`;
   return constructedLink;
 }
