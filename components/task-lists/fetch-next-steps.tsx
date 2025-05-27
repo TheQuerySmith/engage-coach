@@ -16,6 +16,8 @@ interface FetchNextStepsProps {
 
 export default function FetchNextSteps({ userData }: FetchNextStepsProps) {
   const [showCompleted, setShowCompleted] = useState(false);
+  const [dashboardProgress, setDashboardProgress] = useState(0);
+
 
   // Compute the completedMap from the checklist entries passed in userData.
   const completedMap = useMemo(() => {
@@ -38,22 +40,28 @@ export default function FetchNextSteps({ userData }: FetchNextStepsProps) {
 
   // Display logic
   // SET-UP STEPS
-  // If the user has missing set-up steps, show those.
-    // If the user has completed all set-up steps, but it is before the first survey date, show "come back later"
-      // If the user has completed all set-up steps and it is after the first survey date, show nothing (null)
+  // (dashboardProgress === 0) If the user has missing set-up steps, show those.
+
   // SURVEY 1 STEPS
-  // If it is before the first survey date, show nothing
-    // If is after the first survey date, show the complete survey steps.
-      // If the user has completed all survey steps but doesn't have a report, show "come back in one week for report
+  // (dashboardProgress <= 1) If the user has set up surveys
+    // (timeProgress === "beforeSurvey1" || null) ? Show "come back later for surveys" message.
+    // (timeProgress === "duringSurvey1") ? Show survey steps
+    // (timeProgress === "betweenSurveys") ? Show "come back later for reports" message.
+
+// (dashboardProgress === 2) If the user has completed surveys
+    // (timeProgress === "duringSurvey1") ? Still collecting responses
+    // (timeProgress === "betweenSurveys" & !hasReport1) ? Show
+
+  // If it is before the survey open date or no dates exist, 
+  // 2 = If it is after the survey open date, show the complete survey steps.
+  // 3 = If it is before the survey close date sh
 
   // SURVEY 1 REPORT
-  // If the user has a report, show steps
-  // If the user has completed all report steps show "come back later for survey 2"
+  // 4 = If the user has a report, show steps
 
-    // SURVEY 2 STEPS
-  // If it is before the first survey date, show nothing
-    // If is after the first survey date, show the complete survey steps.
-      // If the user has completed all survey steps but doesn't have a report, show "come back in one week for report
+  // SURVEY 2 STEPS
+  // 5 = If the user has completed all report steps show "come back later for survey 2"
+  
 
   // SURVEY 2 REPORT
   // If the user has a report, show steps
@@ -66,8 +74,7 @@ export default function FetchNextSteps({ userData }: FetchNextStepsProps) {
   return (
     <div className="flex flex-col gap-6">
       {/* SET-UP STEPS */}
-      {((!showCompleted && (!completedMap.get("updated_user_profile") || !completedMap.get("setup_course"))) ||
-        showCompleted) ? (
+      {((!showCompleted && dashboardProgress === 0) ||showCompleted) ? (
         <>
           <h2 className="font-bold text-2xl">Set up your Courses</h2>
           <TutorialStep
@@ -111,7 +118,8 @@ export default function FetchNextSteps({ userData }: FetchNextStepsProps) {
             </p>
           </TutorialStep>
         </>
-      ) : (
+      ) : null
+      /* (
         // If the user has completed all set-up steps but it is before the survey open date, show "come back later" message.
         now < (survey1Date as Date) ? (
           <>
@@ -125,9 +133,10 @@ export default function FetchNextSteps({ userData }: FetchNextStepsProps) {
             </p>
           </>
         ) : null
-      )}
+      ) */
+      }
 
-      {displayCompleteSurveySection ? (
+      {((!showCompleted && dashboardProgress <= 1) ||showCompleted) ? (
         <>
           <h2 className="font-bold text-2xl">Survey 1</h2>
           <p>
