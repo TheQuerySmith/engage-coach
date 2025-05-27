@@ -1,7 +1,6 @@
 // app/profile/update/DepartmentForm.tsx
 "use client";
 
-import { createBrowserClient } from "@/utils/supabase/client";
 import { ToastContainer, toast } from 'react-toastify';
 import { Button } from "@/components/ui/button";
 

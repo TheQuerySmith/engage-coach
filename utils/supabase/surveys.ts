@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 export interface getSurveyLinkParams {
   surveyName: string;
   surveyN: number;
-  instructorId: string;
+  instructorId?: string;
   courseId?: string; // Optional for instructor surveys
 }
 
@@ -26,7 +26,8 @@ export async function getSurveyLink({
     throw new Error(`Error fetching survey: ${error?.message}`);
   }
 
+  const instructorParam = instructorId ? `instructor_id=${instructorId}&` : '';
   const courseParam = courseId ? `&course_id=${courseId}` : '';
-  const constructedLink = `${surveyData.link}?instructor_id=${instructorId}&survey_id=${surveyData.id}${courseParam}&survey_n=${surveyN}`;
+  const constructedLink = `${surveyData.link}?${instructorParam}survey_id=${surveyData.id}${courseParam}&survey_n=${surveyN}`;
   return constructedLink;
 }
