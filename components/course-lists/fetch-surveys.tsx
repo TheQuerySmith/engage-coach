@@ -1,93 +1,56 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/utils/supabase/client';
-import CopyButton from '@/components/CopyButton';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/utils/supabase/server';
 
-export default function FetchSurveys() {
-  const [courses, setCourses] = useState<any[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [instructorBase, setInstructorBase] = useState<string>('');
-  const [studentBase, setStudentBase] = useState<string>('');
-  const router = useRouter();
-  const supabase = createClient();
+export default async function FetchSurveys() {
+  const supabase = await createClient();
 
-  // Fetch user and survey records for instructor and student surveys.
-  useEffect(() => {
-    const fetchSurveyData = async () => {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-      if (userError || !user) {
-        router.push('/sign-in');
-        return;
-      }
-      setCurrentUser(user);
-
-      // Fetch courses along with linked instructor responses, survey windows, and student responses.
-      const { data, error: fetchError } = await supabase
-        .from('courses')
-        .select(`
-          id,
-          title,
-          department,
-          number_code,
-          short_id,
-          instructor_course_survey_responses ( survey_n, status ),
-          course_survey_windows ( survey_n, open_at, close_at ),
-          student_course_survey_responses ( survey_n, status )
-        `)
-        .eq('user_id', user.id);
-
-      if (fetchError) {
-        setError(fetchError.message);
-      } else {
-        setCourses(data || []);
-      }
-    };
-
-    // Fetch survey base links from the surveys table.
-    const fetchSurveyRecords = async () => {
-      // Fetch instructor survey record (make sure survey name matches your DB)
-      const { data: instData, error: instError } = await supabase
-        .from('surveys')
-        .select('link')
-        .eq('name', 'Instructor Baseline Survey 2025')
-        .single();
-      if (!instError && instData) {
-        setInstructorBase(instData.link);
-      } else {
-        console.error('Error fetching instructor survey record:', instError);
-      }
-      // Fetch student survey record (ensure survey name matches your DB)
-      const { data: studData, error: studError } = await supabase
-        .from('surveys')
-        .select('link')
-        .eq('name', 'Student Course Survey 2025')
-        .single();
-      if (!studError && studData) {
-        setStudentBase(studData.link);
-      } else {
-        console.error('Error fetching student survey record:', studError);
-      }
-    };
-
-    fetchSurveyData();
-    fetchSurveyRecords();
-  }, [router, supabase]);
-
-  if (error) {
-    return <p>Failed to load surveys: {error}</p>;
+  // Get the current user.
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+  if (userError || !user) {
+    redirect('/sign-in');
   }
+  const currentUser = user;
+
+  // Fetch all courses along with related survey data for the current user.
+  const { data: courses, error: courseError } = await supabase
+    .from('courses')
+    .select(`
+      id,
+      title,
+      department,
+      number_code,
+      short_id,
+      instructor_course_survey_responses ( survey_n, status ),
+      course_survey_windows ( survey_n, open_at, close_at ),
+      student_course_survey_responses ( survey_n, status )
+    `)
+    .eq('user_id', currentUser.id);
+  if (courseError || !courses) {
+    return <p>Failed to load courses: {courseError?.message}</p>;
+  }
+
+  // Fetch base links from the surveys table.
+  const { data: instData } = await supabase
+    .from('surveys')
+    .select('link')
+    .eq('name', 'Instructor Baseline Survey 2025')
+    .single();
+  const { data: studData } = await supabase
+    .from('surveys')
+    .select('link')
+    .eq('name', 'Student Course Survey 2025')
+    .single();
+  const instructorBase = instData?.link || '';
+  const studentBase = studData?.link || '';
 
   return (
     <div className="p-6">
       <h2 className="text-xl font-bold mb-4 text-center">My Courses and Surveys</h2>
-      {courses.map((course) => (
+      {courses.map((course: any) => (
         <div key={course.id} className="mb-8">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold mb-2">
@@ -115,8 +78,8 @@ export default function FetchSurveys() {
               </tr>
             </thead>
             <tbody>
-              {[1, 2].map((survey_n) => {
-                // Get survey window info.
+              {[1, 2].map((survey_n: number) => {
+                // Compute survey window information.
                 const windowData = course.course_survey_windows?.find(
                   (w: any) => w.survey_n === survey_n
                 );
@@ -128,7 +91,8 @@ export default function FetchSurveys() {
                     openInfo = `Opens ${openDate.toLocaleDateString()}`;
                   }
                 }
-                // Get instructor response.
+
+                // Get instructor survey response.
                 const instResp = course.instructor_course_survey_responses?.find(
                   (r: any) => r.survey_n === survey_n
                 );
@@ -136,6 +100,7 @@ export default function FetchSurveys() {
                   instResp && instResp.status === 'Completed'
                     ? 'Completed'
                     : 'Not Completed';
+
                 // Count student completions.
                 const studentsCompleted =
                   course.student_course_survey_responses?.filter(
@@ -155,13 +120,13 @@ export default function FetchSurveys() {
                     : 'text-green-600'
                   : '';
 
-                // Construct dynamic survey links:
-                // For instructor survey, use the fetched instructorBase along with parameters.
+                // Construct dynamic survey links.
+                // For instructor survey, assume an internal link.
                 const instructorSurveyLink =
                   currentUser && instructorBase
                     ? `/surveys/instructor/${survey_n}?course_id=${course.id}`
                     : '';
-                // For student survey, use the fetched studentBase.
+                // For student survey, use the fetched studentBase to construct the external link.
                 const studentSurveyLink = studentBase
                   ? `${studentBase}?course_id=${course.id}&survey_n=${survey_n}`
                   : '';
@@ -194,13 +159,14 @@ export default function FetchSurveys() {
                       ) : (
                         <span className={studentColor}>
                           {studentsCompleted}{' '}
-                            <Link
-                              href={studentSurveyLink}
-                              className="text-blue-500 hover:underline"
-                              target="_blank" rel="noopener noreferrer"
-                            >
-                              (LINK)
-                            </Link>
+                          <Link
+                            href={studentSurveyLink}
+                            className="text-blue-500 hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            (LINK)
+                          </Link>
                         </span>
                       )}
                     </td>
