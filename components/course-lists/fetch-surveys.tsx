@@ -101,11 +101,11 @@ export default async function FetchSurveys() {
                     ? 'Completed'
                     : 'Not Completed';
 
-                // Count student completions.
+                // Count student completions. Convert stored survey_n to number for accurate matching.
                 const studentsCompleted =
                   course.student_course_survey_responses?.filter(
                     (r: any) =>
-                      r.survey_n === survey_n && r.status === 'Completed'
+                      Number(r.survey_n) === survey_n && r.status === 'Completed'
                   ).length || 0;
 
                 // Determine text colors.
