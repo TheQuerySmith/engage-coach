@@ -92,8 +92,6 @@ export default function SetDatesPage() {
     // For each survey number upsert a survey window record
     for (let survey_n of [1, 2]) {
       const windowData = surveyWindows[survey_n];
-      // Note: Adjust the upsert fields as needed. Here we assume `survey_id` is unknown,
-      // so we provide a dummy UUID. In your schema, you may determine the correct survey_id.
       const { error } = await supabase
         .from('course_survey_windows')
         .update({
@@ -103,7 +101,7 @@ export default function SetDatesPage() {
         .match({
           course_id: course.id,
           survey_n: survey_n
-                });
+        });
       if (error) {
         setError(error.message);
         setSaving(false);
@@ -121,6 +119,7 @@ export default function SetDatesPage() {
   // For instructor, we assume an internal link to the instructor survey page.
   // For students, we use the Qualtrics link base.
   const qualtricsBase = "https://utexas.qualtrics.com/jfe/form/SV_b7PqMufNgIi0Jjo";
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">{course.title}</h1>
@@ -132,36 +131,39 @@ export default function SetDatesPage() {
             <div className="mb-4 border p-4 rounded">
               <h2 className="text-xl font-semibold mb-2">Survey {survey_n}</h2>
               {survey_n === 1 && (
-              <AddNotification 
-                message="Select when you and your students will complete Survey 1. We recommend opening the survey after students receive their grades back from their first exam or major assignment and closing the survey approximately 1 week later."
-                type="info" 
-              />
-            )}
-            {survey_n === 2 && (
-              <AddNotification 
-                message="Select when you and your students will complete Survey 2. We recommend opening the survey near the last meeting time and closing the survey approximately 1 week later (at least a few days before finals)."
-                type="info" 
-              />
-            )}
-
-              <label className="block mb-2">
-                Open At:
-                <input 
-                  type="datetime-local"
-                  value={surveyWindows[survey_n]?.open_at || ''}
-                  onChange={(e) => handleChange(survey_n, 'open_at', e.target.value)}
-                  className="border p-2 rounded w-full"
+                <AddNotification 
+                  message="Select when you and your students will complete Survey 1. We recommend opening the survey after students receive their grades back from their first exam or major assignment and closing the survey approximately 1 week later."
+                  type="info" 
                 />
-              </label>
-              <label className="block mb-2">
-                Close At:
-                <input 
-                  type="datetime-local"
-                  value={surveyWindows[survey_n]?.close_at || ''}
-                  onChange={(e) => handleChange(survey_n, 'close_at', e.target.value)}
-                  className="border p-2 rounded w-full"
+              )}
+              {survey_n === 2 && (
+                <AddNotification 
+                  message="Select when you and your students will complete Survey 2. We recommend opening the survey near the last meeting time and closing the survey approximately 1 week later (at least a few days before finals)."
+                  type="info" 
                 />
-              </label>
+              )}
+              <div className="flex flex-row gap-4">
+                <label className="block w-1/2">
+                  <span className="block mb-1">Open At:</span>
+                  <input 
+                    type="datetime-local"
+                    value={surveyWindows[survey_n]?.open_at || ''}
+                    onChange={(e) => handleChange(survey_n, 'open_at', e.target.value)}
+                    onFocus={(e) => e.currentTarget.showPicker?.()}
+                    className="border p-2 rounded w-full"
+                  />
+                </label>
+                <label className="block w-1/2">
+                  <span className="block mb-1">Close At:</span>
+                  <input 
+                    type="datetime-local"
+                    value={surveyWindows[survey_n]?.close_at || ''}
+                    onChange={(e) => handleChange(survey_n, 'close_at', e.target.value)}
+                    onFocus={(e) => e.currentTarget.showPicker?.()}
+                    className="border p-2 rounded w-full"
+                  />
+                </label>
+              </div>
             </div>
           </div>
         ))}
