@@ -5,14 +5,14 @@ import { getSurveyLink } from '@/utils/supabase/surveys';
 interface SurveyPageProps {
   params: {
     short_id: string;
-    n_survey: string;
+    survey_n: string; // updated key
   };
 }
 
 export default async function SurveyPage({ params }: SurveyPageProps) {
   const supabase = await createClient();
-  const { short_id, n_survey } = params;
-  const this_survey_n = Number(n_survey);
+  const { short_id, survey_n } = params;
+  const this_survey_n = Number(survey_n);
   const this_survey_name = 'Instructor Course Survey 2025';
 
   // Fetch the current user
@@ -24,12 +24,22 @@ export default async function SurveyPage({ params }: SurveyPageProps) {
     redirect('/sign-in');
   }
 
-  // Get the survey link using the helper function.
+  // Fetch the course record to get the numerical id
+  const { data: courseData, error: courseError } = await supabase
+    .from('courses')
+    .select('id')
+    .eq('short_id', short_id)
+    .single();
+  if (courseError || !courseData) {
+    throw new Error(courseError?.message || 'Course not found');
+  }
+
+  // Get the survey link using the helper function with the correct course id.
   const uniqueLink = await getSurveyLink({
     surveyName: this_survey_name,
     surveyN: this_survey_n,
     instructorId: user.id,
-    courseId: short_id,
+    courseId: courseData.id,
   });
 
   // Check if the survey is already completed by the instructor.

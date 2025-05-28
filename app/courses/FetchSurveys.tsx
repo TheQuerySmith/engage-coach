@@ -169,7 +169,16 @@ export default async function FetchSurveys() {
                       )}
                     </td>
                     <td className="px-4 py-2 border border-gray-300 text-center">
-                      Not yet available
+                      {studentsCompleted > 0 ? (
+                        <Link
+                          href={`/courses/${course.short_id}/reports/participation/${survey_n}`}
+                          className="text-blue-500 hover:underline"
+                        >
+                          Student List
+                        </Link>
+                      ) : (
+                        'Not yet available'
+                      )}
                     </td>
                   </tr>
                 );
