@@ -18,23 +18,16 @@ A full-stack web application to streamline the administration, delivery, and rep
 
 ### 🛠️ Detailed Next steps
  - [ ] Separate profile next steps 
- - [ ] Add welcome message to profile page
  - [ ] Figure out file storage and report capabilities (https://supabase.com/docs/guides/storage/security/access-control) - user has file folder with user id
 
  ### Optional features
- - [ ] User can upload a profile picture
- - [ ] User can upload a Bio  
- - [ ] User can upload a list of website links (social media, personal website, etc.)
- - [ ] Allow instructors to upload a list of student IDs
- - [ ] Create update tables function when updated (updated_at columns)
- - [ ] Make tabs mimic Canvas
+ - [ ] User can upload a profile picture, bio, and links (social media, personal website, etc.)
  - [ ] If courses are deleted, change to inactive rather than delete
  - [ ] Currently set up for only two survey window: need to drastically update database etc. to allow for multiple survey windows
  - [ ] Added shortcut of adding 8 weeks to second survey window defaults within supabase function
  - [ ] Pre-course Survey
  - [ ] Steps dashboard to add next steps: pull directly from database
  - [ ] Add cslx to steps for conditional formatting?
- - [ ] Change survey primary key to short_id to make urls shorter
  - [ ] Refresh survey pages (see PageRefresh.tsx) to update survey status
  - [ ] Limit Participant lists to 10 per page with pagination
 
