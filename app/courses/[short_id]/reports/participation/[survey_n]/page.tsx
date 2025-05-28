@@ -181,7 +181,14 @@ export default async function ParticipationPage({ params }: ParticipationPagePro
       {/* Not Started */}
       <section className="mb-8">
         <h2 className="text-xl font-semibold mb-2">
-          Not Started ({notStarted.length})
+          Not Started ({notStarted.length}){' '}
+          <Link
+          href={`/courses/${course.short_id}/upload-student-list`}
+          title="If you'd like to track your student participation rates, you can upload a list of student ids here"
+          className="text-blue-600 hover:underline"
+        >
+          (Click here to upload list of student ids)
+        </Link>
         </h2>
         {notStarted.length === 0 ? (
           <p>No student responses with status "Not Started".</p>
