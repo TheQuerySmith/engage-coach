@@ -4,9 +4,10 @@ import React from 'react';
 
 interface SaveToCsvButtonProps {
   data: { student_id: string; status: string }[];
+  buttonText?: string;
 }
 
-export default function SaveToCsvButton({ data }: SaveToCsvButtonProps) {
+export default function SaveToCsvButton({ data, buttonText }: SaveToCsvButtonProps) {
   const handleSaveToCsv = () => {
     // Create CSV header and rows.
     const headers = ['Student ID', 'Status'];
@@ -35,7 +36,7 @@ export default function SaveToCsvButton({ data }: SaveToCsvButtonProps) {
       onClick={handleSaveToCsv}
       className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mt-4"
     >
-      Save to CSV
+      {buttonText || 'Save to CSV'}
     </button>
   );
 }
