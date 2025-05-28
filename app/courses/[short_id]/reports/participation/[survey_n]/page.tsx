@@ -95,6 +95,19 @@ export default async function ParticipationPage({ params }: ParticipationPagePro
         </div>
       )}
 
+      {/* Search  */}
+      <form method="get" action={`/courses/${course.short_id}/reports/participation/search`} className="mb-4">
+        <input
+          type="text"
+          name="query"
+          placeholder="Search by Student ID or Name"
+          className="p-2 border rounded w-64 mr-2"
+        />
+        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
+          Search for Student
+        </button>
+      </form>
+
       {/* Completed */}
       <section className="mb-8">
         <h2 className="text-xl font-semibold mb-2">
