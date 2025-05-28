@@ -92,14 +92,16 @@ export default async function FetchSurveys() {
                   }
                 }
 
-                // Get instructor survey response.
-                const instResp = course.instructor_course_survey_responses?.find(
-                  (r: any) => r.survey_n === survey_n
-                );
-                const instructorCompleted =
-                  instResp && instResp.status === 'Completed'
-                    ? 'Completed'
-                    : 'Not Completed';
+                // Get instructor survey response using a numeric comparison.
+                const instRespCompleted = course.instructor_course_survey_responses?.some(
+                  (r: any) => Number(r.survey_n) === survey_n && r.status === 'Completed'
+                  );
+                  console.log(
+                  `Survey ${survey_n} for course ${course.short_id} - Any instructor responses completed:`,
+                  instRespCompleted
+                  );
+                  // Determine completion status based on any "Completed" responses.
+                const instructorCompleted = instRespCompleted ? 'Completed' : 'Not Completed';
 
                 // Count student completions. Convert stored survey_n to number for accurate matching.
                 const studentsCompleted =
