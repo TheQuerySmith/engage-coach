@@ -2,7 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import SurveyList from "@/components/course-lists/fetch-surveys";
+import SurveyList from "./FetchSurveys";
 
 export default async function ProtectedPage() {
   const supabase = await createClient();
