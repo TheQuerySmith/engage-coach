@@ -66,9 +66,14 @@ export default async function ParticipationPage({ params }: ParticipationPagePro
   const bestResponses = Array.from(bestResponseMap.values());
 
   // Group best responses by status.
-  const notStarted = bestResponses.filter((r: any) => r.status === 'Not Started');
-  const inProgress = bestResponses.filter((r: any) => r.status === 'In Progress');
-  const completed = bestResponses.filter((r: any) => r.status === 'Completed');
+  let notStarted = bestResponses.filter((r: any) => r.status === 'Not Started');
+  let inProgress = bestResponses.filter((r: any) => r.status === 'In Progress');
+  let completed = bestResponses.filter((r: any) => r.status === 'Completed');
+
+  // Sort each group alphabetically by student_id.
+  notStarted.sort((a, b) => a.student_id.localeCompare(b.student_id));
+  inProgress.sort((a, b) => a.student_id.localeCompare(b.student_id));
+  completed.sort((a, b) => a.student_id.localeCompare(b.student_id));
 
   // Helper function to format name.
   const formatName = (resp: any) => {
@@ -133,7 +138,7 @@ export default async function ParticipationPage({ params }: ParticipationPagePro
         {inProgress.length === 0 ? (
           <p>No student responses with status "In Progress".</p>
         ) : (
-          <table className="min-w-full border-collapse border border-gray-300">
+          <table className="w-2/3 border-collapse border border-gray-300">
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-4 py-2 border border-gray-300">Student ID</th>
@@ -168,7 +173,7 @@ export default async function ParticipationPage({ params }: ParticipationPagePro
         {notStarted.length === 0 ? (
           <p>No student responses with status "Not Started".</p>
         ) : (
-          <table className="min-w-full border-collapse border border-gray-300">
+          <table className="w-2/3 border-collapse border border-gray-300">
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-4 py-2 border border-gray-300">Student ID</th>

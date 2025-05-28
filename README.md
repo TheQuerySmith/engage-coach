@@ -36,6 +36,7 @@ A full-stack web application to streamline the administration, delivery, and rep
  - [ ] Add cslx to steps for conditional formatting?
  - [ ] Change survey primary key to short_id to make urls shorter
  - [ ] Refresh survey pages (see PageRefresh.tsx) to update survey status
+ - [ ] Limit Participant lists to 10 per page with pagination
 
 
 ### Bug Fixes
