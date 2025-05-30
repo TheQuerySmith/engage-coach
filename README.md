@@ -10,18 +10,25 @@ A full-stack web application to streamline the administration, delivery, and rep
 
 | Milestone | Description | Status |
 |----------|-------------|--------|
-| ✅ Profile | Update profile upon signup | In Progress |
-| ✅ Courses | Create and view courses | In Progress |
-| ✅ Surveys | Create and view surveys | In Progress |
+| ✅ Profile | Update profile upon signup | Done |
+| ✅ Courses | Create and view courses | Done |
+| ✅ Surveys | View surveys and participant reports | Done |
+| [ ] Dashboard | View survey status and next steps | In Progress |
+| [ ] Reporting | Generate and download reports | Not Started |
+| [ ] Notifications | Receive email notifications for survey updates | Not Started |
+| [ ] Community | Access community, resources, and book | Not Started |
 
+- Internal team members can:
+| Milestone | Description | Status |
+|----------|-------------|--------|
+| [ ] Admin Dashboard | View and manage all users, courses, and surveys | Not Started |
+| [ ] Mimic User | Impersonate any user for support | Not Started |
+| [ ] Notifications | Send notifications to users | Not Started |
+| [ ] Reporting | Generate and download reports for all users | Not Started |
+- [ ] Documentation | View documentation and user support | Not Started |
 
-
-### 🛠️ Detailed Next steps
- - [ ] Separate profile next steps 
+ ### Improve features
  - [ ] Figure out file storage and report capabilities (https://supabase.com/docs/guides/storage/security/access-control) - user has file folder with user id
-
- ### Optional features
- - [ ] User can upload a profile picture, bio, and links (social media, personal website, etc.)
  - [ ] If courses are deleted, change to inactive rather than delete
  - [ ] Currently set up for only two survey window: need to drastically update database etc. to allow for multiple survey windows
  - [ ] Added shortcut of adding 8 weeks to second survey window defaults within supabase function
@@ -30,6 +37,8 @@ A full-stack web application to streamline the administration, delivery, and rep
  - [ ] Add cslx to steps for conditional formatting?
  - [ ] Refresh survey pages (see PageRefresh.tsx) to update survey status
  - [ ] Limit Participant lists to 10 per page with pagination
+ - [ ] User can upload a profile picture, bio, and links (social media, personal website, etc.)
+ - [ ] Create linked instructors in a community page
 
 
 ### Bug Fixes
