@@ -12,6 +12,13 @@ export default async function DashboardPage() {
     return redirect("/sign-in");
   }
 
+  type TaskStatusRow = {
+    profile_done: boolean
+    course_created: boolean
+    dates_confirmed: boolean
+    consent_done: boolean
+  }
+
   // Fetch profile details.
   const { data: profile } = await supabase
     .from("profiles")
