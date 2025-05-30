@@ -108,22 +108,21 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
   const survey1Header = `Survey 1: Opened from ${formatDate(s1OpenData?.open_at)} to ${formatDate(s1CloseData?.close_at)}`;
   const survey2Header = `Survey 2: Opened from ${formatDate(s2OpenData?.open_at)} to ${formatDate(s2CloseData?.close_at)}`;
 
-  // Simulate userData (if needed elsewhere).
   const userData: UserData = {
     survey1OpenDate: s1OpenData?.open_at || null,
     survey1CloseDate: s1CloseData?.close_at || null,
+    survey2OpenDate: s2OpenData?.open_at || null,
+    survey2CloseDate: s2CloseData?.close_at || null,
   };
 
   const now = new Date();
-  // Only show Survey 2 section if current time is after Survey 1 close date.
-  const survey1CloseDate = userData.survey1CloseDate ? new Date(userData.survey1CloseDate) : null;
 
   // Determine if we show all tasks.
   const showAllTasks = searchParams?.showAllTasks === "true";
 
   // Helper: render a TutorialStep only if not completed (or if showAllTasks is true).
-  const renderStep = (step: JSX.Element, completed: boolean) => {
-    return !completed || showAllTasks ? step : null;
+  const renderStep = (step: JSX.Element, completed: boolean, displayCondition: boolean = true) => {
+    return (!completed || showAllTasks) && displayCondition ? step : null;
   };
 
   return (
@@ -147,7 +146,8 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
             <Link href="/profile/update" className="font-bold hover:underline text-foreground/80">
               Profile Update Page
             </Link>{" "}
-            to complete your profile details.
+            to update your profile. Only your profile name and department will be visible to other
+              users. After you update your profile, this item will be marked as complete.
           </p>
         </TutorialStep>,
         status.profile_done
@@ -165,25 +165,32 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
             <Link href="/courses" className="font-bold hover:underline text-foreground/80">
               Courses &amp; Surveys Page
             </Link>{" "}
-            to create and manage your courses.
+            to set up your course. If you have multiple courses, set them up one at a time. 
+            Once you set up at least one course, this item will be marked as complete.
           </p>
         </TutorialStep>,
         status.course_created
       )}
 
       {renderStep(
-        <TutorialStep title="Confirm survey dates" stepType="setup" checked={status.dates_confirmed}>
-          <p>Confirm your survey dates on your course page so that the surveys schedule correctly.</p>
-        </TutorialStep>,
-        status.dates_confirmed
-      )}
-
-      {renderStep(
         <TutorialStep title="Answer research consent" stepType="setup" checked={status.consent_done}>
           <p>Provide your research consent in your profile settings to proceed.</p>
         </TutorialStep>,
-        status.consent_done
+        status.consent_done, status.course_created // Show only if courses set up
       )}
+
+      {status.profile_done && status.course_created && status.consent_done &&
+        renderStep(
+          <>
+            <p>
+              👍 You're all set up! You can always update your courses and scheduled surveys on the{" "}
+              <Link href="/courses" className="font-bold hover:underline text-foreground/80">
+              Courses &amp; Surveys Page
+              </Link>
+            </p>
+          </>,
+          false // This step is always shown when the condition is met
+        )}
 
       {/* Survey 1 Tasks */}
       <h2 className="font-bold text-2xl">{survey1Header}</h2>
@@ -194,7 +201,12 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
           stepType="surveys"
           checked={status.survey1_instructor_done}
         >
-          <p>Complete the instructor survey for Survey 1 via the link on your Courses page.</p>
+          <p>Your instructor surveys are now open! Head over to the{" "}
+            <Link href="/courses" className="font-bold hover:underline text-foreground/80">
+              Courses &amp; Surveys Page
+            </Link>{" "}
+            to complete the instructor survey for Survey 1 when available.
+          </p>
         </TutorialStep>,
         status.survey1_instructor_done
       )}
@@ -206,33 +218,54 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
           checked={status.survey1_students_done}
         >
           <p>
-            Ensure the minimum required student responses are recorded for Survey 1. The threshold is met once enough responses are received.
+            Your student surveys are now open! Head over to the{" "}
+            <Link href="/courses" className="font-bold hover:underline text-foreground/80">
+              Courses &amp; Surveys Page
+            </Link>{" "}
+            to find survey links for each course. 
+            Once at least 12 students have completed surveys, this item will be marked as complete.
           </p>
         </TutorialStep>,
         status.survey1_students_done
       )}
 
-      {renderStep(
-        <TutorialStep
-          title="Generate Survey 1 Report"
-          stepType="surveys"
-          checked={status.survey1_report_done}
-        >
-          <p>A report for Survey 1 is generated once survey data is complete. Check the Reports page for details.</p>
-        </TutorialStep>,
-        status.survey1_report_done
-      )}
 
-      {renderStep(
-        <TutorialStep
+      {status.survey1_students_done && status.survey1_instructor_done && !status.survey1_report_done && // Surveys completed, report not yet generated
+        renderStep(
+          <>
+            <p>
+              👍 Survey reports are on the way! You will receive an email when they are ready!
+            </p>
+          </>,
+           false // When no reports available
+        )}
+
+      {status.survey1_report_done && // Surveys completed, report generated
+        renderStep(
+          <TutorialStep
           title="Join Survey 1 Discussion"
           stepType="surveys"
           checked={status.survey1_discussion_signed || status.survey1_discussion_optout}
         >
-          <p>Indicate your discussion preference for Survey 1—either sign up or opt out.</p>
+          <p>Sign up to discuss your student reports with colleagues and facilitators. 
+            You can also opt out if you would prefer not to take part in these discussions.</p>
         </TutorialStep>,
-        status.survey1_discussion_signed || status.survey1_discussion_optout
-      )}
+          status.survey1_discussion_signed || status.survey1_discussion_optout 
+        )}
+
+    {status.survey1_instructor_done && status.survey1_students_done && status.survey1_report_done &&
+        renderStep(
+          <>
+            <p>
+              👍 You now have reports available at {" "}
+              <Link href="/courses" className="font-bold hover:underline text-foreground/80">
+              Courses &amp; Surveys Page
+              </Link>
+            </p>
+          </>,
+          false // This step is always shown when the condition is met
+        )}
+
 
       {/* Survey 2 Tasks (only if now is after Survey 1 close date) */}
         <>
