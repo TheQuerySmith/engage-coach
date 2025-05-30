@@ -1,4 +1,4 @@
-import FetchNextSteps from "@/components/task-lists/fetch-next-steps";
+import FetchNextSteps from "./FetchNextSteps";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import AddNotification from "@/components/ui/notification-ribbon";

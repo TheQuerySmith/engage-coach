@@ -1,4 +1,4 @@
-import { Checkbox } from "../ui/checkbox-read";
+import { Checkbox } from "@/components/ui/checkbox-read";
 
 type StepType = "setup" | "surveys" | "optional" | "resources";
 

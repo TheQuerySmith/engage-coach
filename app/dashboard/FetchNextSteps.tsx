@@ -1,5 +1,5 @@
 'use client';
-import { TutorialStep } from "./tutorial-step";
+import { TutorialStep } from "./TutorialStep";
 import { useState, useMemo, useEffect } from "react";
 
 // Accept props from the server component
