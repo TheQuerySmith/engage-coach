@@ -102,7 +102,7 @@ create table profiles (
   created_at timestamp with time zone default now(),
   updated_at timestamp with time zone default now(),
   user_edited boolean default false,
-  consent boolean default false
+  consent boolean
 );
 
 ##### To make a checklist of user information
@@ -141,7 +141,8 @@ create table courses (
   additional_info text,
   pct_instructor_decision int,
   pct_instructor_synchronous int,
-  pct_instructor_asynchronous int
+  pct_instructor_asynchronous int,
+  is_active boolean default true
 );
 
 create table surveys (
@@ -210,12 +211,114 @@ create index on course_survey_windows (survey_id, open_at, close_at);
 
 
 
+
+-- 2.1  All instructor-owned uploads (grades, recordings, future asset types)
+create table user_uploads (
+  id               uuid primary key default gen_random_uuid(),
+  user_id          uuid not null references profiles(id) on delete cascade,
+  course_id        uuid not null references courses(id) on delete cascade,
+  file_type        text not null check (file_type in ('grade_csv','recording_mp4','recording_mkv')),
+  supabase_path    text not null,             -- e.g. storage bucket key
+  uploaded_at      timestamptz default now(),
+  -- soft-delete so you never lose the audit trail
+  is_deleted       boolean default false
+);
+create index on user_uploads (user_id, course_id, file_type) where is_deleted = false;
+
+-- 2.2  Latest and historical PDF/HTML reports
+create table user_reports (
+  id               uuid primary key default gen_random_uuid(),
+  user_id          uuid not null references profiles(id) on delete cascade,
+  course_id        uuid not null references courses(id) on delete cascade,
+  survey_n         int  not null check (survey_n in (1,2)),
+  supabase_path    text not null,
+  generated_at     timestamptz default now()
+);
+-- quick lookup of "latest" report
+create unique index latest_report_per_survey
+  on user_reports (course_id, survey_n, generated_at desc);
+
+-- 2.3  Discussion sign-up vs opt-out
+create type discussion_status as enum ('signed_up','opt_out','undecided');
+create table discussion_signups (
+  user_id          uuid primary key references profiles(id) on delete cascade,
+  survey_n         int  not null check (survey_n in (1,2)),
+  status           discussion_status not null default 'undecided',
+  updated_at       timestamptz default now()
+);
+
+-- 2.4  App settings table (easy to find)
+create table app_settings (
+  key   text primary key,
+  value int not null
+);
+
+insert into app_settings (key,value) values
+  ('min_student_responses', 12),
+  ('min_recordings_per_course', 2);
+
+
+
 -- NOTE: Need to allow NULL values on level/type/format: 
 -- e.g., format IS NULL OR format = ANY (ARRAY['In-Person'::text, 'Online'::text, 'Hybrid'::text, 'Other'::text])
 
+#### Making checklist view
+select
+  /* ───── WHO ───── */
+  p.id                                            as user_id,
 
+  /* ───── GLOBAL TASKS ───── */
+  p.user_edited                                   as profile_done,
+  (ac.n_active > 0)                               as course_created,
+  uc_dates.completed                              as dates_confirmed,
+  (p.consent is not null)                         as consent_done,
 
+  /* ───── SURVEY 1 ───── */
+  bool_or(sp.instructor_done)  filter (where sp.survey_n = 1)  as survey1_instructor_done,
+  bool_or(
+    sp.n_students_done >= (
+      select value::int from app_settings where key = 'min_student_responses'
+    )
+  )                               filter (where sp.survey_n = 1)  as survey1_students_done,
+  bool_or(sp.report_latest_path <> '') filter (where sp.survey_n = 1)  as survey1_report_done,
+  bool_or(ds.status = 'signed_up')   filter (where ds.survey_n = 1)     as survey1_discussion_signed,
+  bool_or(ds.status = 'opt_out')     filter (where ds.survey_n = 1)     as survey1_discussion_optout,
 
+  /* ───── SURVEY 2 ───── */
+  bool_or(sp.instructor_done)  filter (where sp.survey_n = 2)  as survey2_instructor_done,
+  bool_or(
+    sp.n_students_done >= (
+      select value::int from app_settings where key = 'min_student_responses'
+    )
+  )                               filter (where sp.survey_n = 2)  as survey2_students_done,
+  bool_or(sp.report_latest_path <> '') filter (where sp.survey_n = 2)  as survey2_report_done,
+  bool_or(ds.status = 'signed_up')   filter (where ds.survey_n = 2)     as survey2_discussion_signed,
+  bool_or(ds.status = 'opt_out')     filter (where ds.survey_n = 2)     as survey2_discussion_optout,
+
+  /* ───── COURSE-WIDE UPLOADS ───── */
+  us.grades_ok,
+  us.recordings_ok
+
+from profiles p
+left join active_courses        ac on ac.user_id = p.id
+left join user_checklist uc_dates
+       on uc_dates.user_id = p.id
+      and uc_dates.checklist_item_id = (
+        select id from checklist_items where name = 'confirm_dates'
+      )
+left join survey_progress  sp on sp.user_id = p.id
+left join discussion_signups ds on ds.user_id = p.id
+left join uploads_status   us on us.user_id = p.id
+
+/*───────────── NEW: group by every non-aggregate column ─────────────*/
+group by
+  p.id,
+  p.user_edited,
+  ac.n_active,
+  uc_dates.completed,
+  p.consent,
+  us.grades_ok,
+  us.recordings_ok;
 
 SQL Functions
 
@@ -248,4 +351,18 @@ BEGIN
   RETURN 'member_' || hex_part;
 END;
 
+```
 
+### Dashboard brainstorming
+
+1) Did the user update their profile? (profile.user_edited == T; never changes back)
+2) Did the user set up a course? (courses table includes user_id and is_active = T)
+3) Did the user confirm dates for survey?  (checklist_items.name ="confirm_dates" : where relevant user_checklist for user_id is true; changes back if another course is added)
+4) Did the user choose consent to research? (profile.consent is not null (T or F))
+5) For each survey (1:2):
+5a) Did the instructor complete the survey? (instructor_course_survey_responses.instructor_id exists for course_id & status = 'Completed' & survey_n = [1:2])
+5b) Did at least 12 students complete the survey? (count of student_course_survey_responses.course_id & survey_n = [1:2] & status = "Completed"
+5c) Does that survey reports exist? (Need to create a new database that tracks reports that can be linked to each user)
+5d): Has the user signed up to discuss reports or opted out? (checklist_items.name ="discussion_signup_[1:2]" : where relevant user_checklist for user_id is true;
+6): Has the user uploaded grade data for every active course?
+7): Has the user uploaded two course recording files? (Need new way to track this)
