@@ -202,7 +202,7 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
         const surveyOpenDate = userData[surveyOpenDateKey] ? new Date(userData[surveyOpenDateKey]!) : null;
         const header = surveyNum === 1 ? survey1Header : survey2Header;
 
-        if (!surveyOpenDate || now < surveyOpenDate) {
+        if (!surveyOpenDate || now < surveyOpenDate && !showAllTasks) {
           return (
             <div key={surveyNum}>
               <h2 className="font-bold text-2xl">{header}</h2>
@@ -291,22 +291,24 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
         );
       })}
 
-      {/* Course-Wide Uploads */}
+      {/* Course-Wide Uploads 
       <h2 className="font-bold text-2xl">Course Uploads</h2>
 
       {renderStep(
         <TutorialStep title="Upload Grades" stepType="optional" checked={status.grades_ok}>
-          <p>Upload course grades to ensure your report data is accurate.</p>
+          <p>Upload course grades to provide greater insights into what is working for your students.</p>
         </TutorialStep>,
-        status.grades_ok
+        status.grades_ok,
+        userData.survey2CloseDate && now > new Date(userData.survey2CloseDate)
       )}
 
       {renderStep(
         <TutorialStep title="Upload Course Recordings" stepType="optional" checked={status.recordings_ok}>
-          <p>Upload the required course recording files so that your students can review course material.</p>
+          <p>Upload the required course recording files to learn more about what students' are noticing.</p>
         </TutorialStep>,
         status.recordings_ok
       )}
+        */}
 
       {/* Show All Tasks Button: link back to same page with showAllTasks=true */}
       <div className="pt-6">
@@ -314,7 +316,7 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
           href={`?showAllTasks=${!showAllTasks ? "true" : "false"}`}
           className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded inline-block"
         >
-          {showAllTasks ? "Hide Completed Tasks" : "Show All Tasks"}
+          {showAllTasks ? "Hide All Tasks" : "Show All Tasks"}
         </Link>
       </div>
     </div>

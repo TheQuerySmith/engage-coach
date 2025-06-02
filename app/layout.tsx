@@ -68,16 +68,10 @@ export default function RootLayout({
                     Courses and Surveys
                   </Link>
                   <Link
-                    href="/reports"
+                    href="/profile"
                     className="text-gray-700 hover:text-blue-600"
                   >
-                    Reports
-                  </Link>
-                  <Link
-                    href="/settings"
-                    className="text-gray-700 hover:text-blue-600"
-                  >
-                    Settings
+                    Profile
                   </Link>
                 </nav>
               </aside>

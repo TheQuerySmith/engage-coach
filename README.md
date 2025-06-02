@@ -13,7 +13,7 @@ A full-stack web application to streamline the administration, delivery, and rep
 | ✅ Profile | Update profile upon signup | Done |
 | ✅ Courses | Create and view courses | Done |
 | ✅ Surveys | View surveys and participant reports | Done |
-| [ ] Dashboard | View survey status and next steps | In Progress |
+| ✅ Dashboard | View survey status and next steps | In Progress |
 | [ ] Reporting | Generate and download reports | Not Started |
 | [ ] Notifications | Receive email notifications for survey updates | Not Started |
 | [ ] Community | Access community, resources, and book | Not Started |
