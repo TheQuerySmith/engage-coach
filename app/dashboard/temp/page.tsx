@@ -105,8 +105,8 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
   // Format dates if available.
   const formatDate = (d: any) => (d ? new Date(d).toLocaleDateString() : "N/A");
 
-  const survey1Header = `Survey 1: Opened from ${formatDate(s1OpenData?.open_at)} to ${formatDate(s1CloseData?.close_at)}`;
-  const survey2Header = `Survey 2: Opened from ${formatDate(s2OpenData?.open_at)} to ${formatDate(s2CloseData?.close_at)}`;
+  const survey1Header = `Survey 1: Open from ${formatDate(s1OpenData?.open_at)} to ${formatDate(s1CloseData?.close_at)}`;
+  const survey2Header = `Survey 2: Open from ${formatDate(s2OpenData?.open_at)} to ${formatDate(s2CloseData?.close_at)}`;
 
   const userData: UserData = {
     survey1OpenDate: s1OpenData?.open_at || null,
@@ -223,7 +223,7 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
               Courses &amp; Surveys Page
             </Link>{" "}
             to find survey links for each course. 
-            Once at least 12 students have completed surveys, this item will be marked as complete.
+            Once at least 12 students in a course have completed surveys, this item will be marked as complete.
           </p>
         </TutorialStep>,
         status.survey1_students_done
@@ -240,6 +240,19 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
            false // When no reports available
         )}
 
+    {status.survey1_report_done &&
+        renderStep(
+          <>
+            <p>
+              👍 You now have reports available at {" "}
+              <Link href="/courses" className="font-bold hover:underline text-foreground/80">
+              Courses &amp; Surveys Page
+              </Link>
+            </p>
+          </>,
+          false // This step is always shown when the condition is met
+        )}
+
       {status.survey1_report_done && // Surveys completed, report generated
         renderStep(
           <TutorialStep
@@ -251,19 +264,6 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
             You can also opt out if you would prefer not to take part in these discussions.</p>
         </TutorialStep>,
           status.survey1_discussion_signed || status.survey1_discussion_optout 
-        )}
-
-    {status.survey1_instructor_done && status.survey1_students_done && status.survey1_report_done &&
-        renderStep(
-          <>
-            <p>
-              👍 You now have reports available at {" "}
-              <Link href="/courses" className="font-bold hover:underline text-foreground/80">
-              Courses &amp; Surveys Page
-              </Link>
-            </p>
-          </>,
-          false // This step is always shown when the condition is met
         )}
 
 
