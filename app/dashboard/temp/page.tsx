@@ -192,131 +192,72 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
           false // This step is always shown when the condition is met
         )}
 
-      {/* Survey 1 Tasks */}
-      <h2 className="font-bold text-2xl">{survey1Header}</h2>
-
-      {renderStep(
-        <TutorialStep
-          title="Complete Instructor Survey for Survey 1"
-          stepType="surveys"
-          checked={status.survey1_instructor_done}
-        >
-          <p>Your instructor surveys are now open! Head over to the{" "}
-            <Link href="/courses" className="font-bold hover:underline text-foreground/80">
-              Courses &amp; Surveys Page
-            </Link>{" "}
-            to complete the instructor survey for Survey 1 when available.
-          </p>
-        </TutorialStep>,
-        status.survey1_instructor_done
-      )}
-
-      {renderStep(
-        <TutorialStep
-          title="Collect Student Responses for Survey 1"
-          stepType="surveys"
-          checked={status.survey1_students_done}
-        >
-          <p>
-            Your student surveys are now open! Head over to the{" "}
-            <Link href="/courses" className="font-bold hover:underline text-foreground/80">
-              Courses &amp; Surveys Page
-            </Link>{" "}
-            to find survey links for each course. 
-            Once at least 12 students in a course have completed surveys, this item will be marked as complete.
-          </p>
-        </TutorialStep>,
-        status.survey1_students_done
-      )}
-
-
-      {status.survey1_students_done && status.survey1_instructor_done && !status.survey1_report_done && // Surveys completed, report not yet generated
-        renderStep(
-          <>
-            <p>
-              👍 Survey reports are on the way! You will receive an email when they are ready!
-            </p>
-          </>,
-           false // When no reports available
-        )}
-
-    {status.survey1_report_done &&
-        renderStep(
-          <>
-            <p>
-              👍 You now have reports available at {" "}
-              <Link href="/courses" className="font-bold hover:underline text-foreground/80">
-              Courses &amp; Surveys Page
-              </Link>
-            </p>
-          </>,
-          false // This step is always shown when the condition is met
-        )}
-
-      {status.survey1_report_done && // Surveys completed, report generated
-        renderStep(
-          <TutorialStep
-          title="Join Survey 1 Discussion"
-          stepType="surveys"
-          checked={status.survey1_discussion_signed || status.survey1_discussion_optout}
-        >
-          <p>Sign up to discuss your student reports with colleagues and facilitators. 
-            You can also opt out if you would prefer not to take part in these discussions.</p>
-        </TutorialStep>,
-          status.survey1_discussion_signed || status.survey1_discussion_optout 
-        )}
-
-
-      {/* Survey 2 Tasks (only if now is after Survey 1 close date) */}
-        <>
-          <h2 className="font-bold text-2xl">{survey2Header}</h2>
-
-          {renderStep(
-            <TutorialStep
-              title="Complete Instructor Survey for Survey 2"
-              stepType="surveys"
-              checked={status.survey2_instructor_done}
-            >
-              <p>Complete the instructor survey for Survey 2 when available.</p>
-            </TutorialStep>,
-            status.survey2_instructor_done
-          )}
-
-          {renderStep(
-            <TutorialStep
-              title="Collect Student Responses for Survey 2"
-              stepType="surveys"
-              checked={status.survey2_students_done}
-            >
-              <p>Ensure that the minimum required number of students complete Survey 2.</p>
-            </TutorialStep>,
-            status.survey2_students_done
-          )}
-
-          {renderStep(
-            <TutorialStep
-              title="Generate Survey 2 Report"
-              stepType="surveys"
-              checked={status.survey2_report_done}
-            >
-              <p>A report for Survey 2 is generated after data collection is complete.</p>
-            </TutorialStep>,
-            status.survey2_report_done
-          )}
-
-          {renderStep(
-            <TutorialStep
-              title="Join Survey 2 Discussion"
-              stepType="surveys"
-              checked={status.survey2_discussion_signed || status.survey2_discussion_optout}
-            >
-              <p>
-                Indicate whether you wish to participate in the Survey 2 discussion by signing up or opting out.
-              </p>
-            </TutorialStep>,
-            status.survey2_discussion_signed || status.survey2_discussion_optout
-          )}
-        </>
+      {/* Survey Tasks Loop: iterate over surveys 1 and 2 */}
+      {[1, 2].map((surveyNum) => {
+        // For Survey 2, only render tasks if we're past Survey 1's close date.
+        if (surveyNum === 2 && !(userData.survey1CloseDate && now >= userData.survey1CloseDate)) {
+          return null;
+        }
+        const header = surveyNum === 1 ? survey1Header : survey2Header;
+        return (
+          <div key={surveyNum}>
+            <h2 className="font-bold text-2xl">{header}</h2>
+            {renderStep(
+              <TutorialStep
+                title={`Complete Instructor Survey for Survey ${surveyNum}`}
+                stepType="surveys"
+                checked={(status as any)[`survey${surveyNum}_instructor_done`]}
+              >
+                <p>
+                  Complete the instructor survey for Survey {surveyNum} via the link on your Courses page.
+                </p>
+              </TutorialStep>,
+              (status as any)[`survey${surveyNum}_instructor_done`]
+            )}
+            {renderStep(
+              <TutorialStep
+                title={`Collect Student Responses for Survey ${surveyNum}`}
+                stepType="surveys"
+                checked={(status as any)[`survey${surveyNum}_students_done`]}
+              >
+                <p>
+                  Your student surveys are now open! Head over to the{" "}
+                  <Link href="/courses" className="font-bold hover:underline text-foreground/80">
+                    Courses &amp; Surveys Page
+                  </Link>{" "}
+                  to find survey links for each course. Once at least 12 students in a course have completed surveys, this item will be marked as complete.
+                </p>
+              </TutorialStep>,
+              (status as any)[`survey${surveyNum}_students_done`]
+            )}
+            {renderStep(
+              <TutorialStep
+                title={`Generate Survey ${surveyNum} Report`}
+                stepType="surveys"
+                checked={(status as any)[`survey${surveyNum}_report_done`]}
+              >
+                <p>
+                  A report for Survey {surveyNum} is generated once survey data is complete. Check the Reports page for details.
+                </p>
+              </TutorialStep>,
+              (status as any)[`survey${surveyNum}_report_done`],
+              (status as any)[`survey${surveyNum}_instructor_done`] && (status as any)[`survey${surveyNum}_students_done`]
+            )}
+            {renderStep(
+              <TutorialStep
+                title={`Join Survey ${surveyNum} Discussion`}
+                stepType="surveys"
+                checked={(status as any)[`survey${surveyNum}_discussion_signed`] || (status as any)[`survey${surveyNum}_discussion_optout`]}
+              >
+                <p>
+                  Indicate your discussion preference for Survey {surveyNum}—either sign up or opt out.
+                </p>
+              </TutorialStep>,
+              (status as any)[`survey${surveyNum}_discussion_signed`] || (status as any)[`survey${surveyNum}_discussion_optout`]
+            )}
+          </div>
+        );
+      })}
 
       {/* Course-Wide Uploads */}
       <h2 className="font-bold text-2xl">Course Uploads</h2>
