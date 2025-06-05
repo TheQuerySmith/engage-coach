@@ -52,7 +52,7 @@ export default async function SurveyPage({ params }: SurveyPageProps) {
 
   if (surveyCompleted) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-green-50 overflow-hidden">
+      <div className="flex flex-col items-center justify-center min-h-1/4 bg-green-50 overflow-hidden">
         <h1 className="text-2xl font-bold text-green-700">Survey Completed!</h1>
         <p className="text-gray-700 mt-4">
           Thank you for completing the survey. You may now proceed to the next step.
@@ -62,7 +62,7 @@ export default async function SurveyPage({ params }: SurveyPageProps) {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 overflow-hidden">
+    <div className="flex flex-col items-center justify-center min-h-1/4 bg-gray-50 overflow-hidden">
       <iframe
         src={uniqueLink}
         title="Qualtrics Survey"

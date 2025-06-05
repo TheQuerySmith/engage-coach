@@ -2,7 +2,7 @@ import { ChartBarIcon, AcademicCapIcon, BookOpenIcon, UserGroupIcon } from "@her
 
 export default async function Home() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-8">
+    <div className="min-h-3/4 flex flex-col items-center justify-center bg-background p-8">
       <div className="max-w-3xl text-center">
         <h1 className="text-4xl sm:text-5xl font-bold mb-2">
           Engage Your Students—Transform Your Classroom

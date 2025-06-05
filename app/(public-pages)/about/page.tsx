@@ -1,6 +1,6 @@
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex items-center justify-center py-10 px-4">
+    <div className="min-h-3/4 bg-background text-foreground flex items-center justify-center py-10 px-4">
       <div className="max-w-3xl">
         <h1 className="text-4xl font-bold mb-6">About Our Project</h1>
         <section className="mb-8">
