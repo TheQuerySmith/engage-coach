@@ -45,6 +45,18 @@ export default function RootLayout({
                     Engage Coach
                   </Link>
                 </div>
+                <div className="flex space-x-4">
+                  <Link href="/about" className="text-gray-500 hover:text-blue-600">
+                    About
+                  </Link>
+                  <Link href="/team" className="text-gray-500 hover:text-blue-600">
+                    Team
+                  </Link>
+                  <Link href="/survey" className="text-gray-500 hover:text-blue-600">
+                    Survey
+                  </Link>
+                </div>
+                
                 <div className="flex-1 flex justify-end">
                   <HeaderAuth />
                 </div>
