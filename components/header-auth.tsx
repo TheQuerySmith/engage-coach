@@ -12,80 +12,65 @@ export default async function AuthButton() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // If environment variables are missing, provide useful instructions.
+  if (!hasEnvVars) {
+    return (
+      <div className="flex gap-4 items-center">
+        <div>
+          <Badge variant={"default"} className="font-normal pointer-events-none">
+            Please update .env.local file with anon key and url
+          </Badge>
+        </div>
+        <div className="flex gap-2">
+          <Button asChild size="sm" variant={"outline"} disabled className="opacity-75 cursor-none pointer-events-none">
+            <Link href="/sign-in">Sign in</Link>
+          </Button>
+          <Button asChild size="sm" variant={"default"} disabled className="opacity-75 cursor-none pointer-events-none">
+            <Link href="/sign-up">Sign up</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    // If no user is signed in, display sign in and sign up links.
+    return (
+      <div className="flex gap-2">
+        <Button asChild size="sm" variant={"outline"}>
+          <Link href="/sign-in">Sign in</Link>
+        </Button>
+        <Button asChild size="sm" variant={"default"}>
+          <Link href="/sign-up">Sign up</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  // If a user is signed in, attempt to fetch their profile.
   const { data: profile, error: fetchError } = await supabase
-    .from('profiles')
-    .select('profile_name, email')
-    .eq('id', user?.id)
+    .from("profiles")
+    .select("profile_name, email")
+    .eq("id", user?.id)
     .single();
 
   if (fetchError) {
-    console.error(fetchError)
-    return <p className="text-center text-red-600 p-6">Failed to load your checklist.</p>
+    console.error(fetchError);
+    return <p className="text-center text-red-600 p-6">Failed to load your profile.</p>;
   }
 
-  if (!hasEnvVars) {
-    return (
-      <>
-        <div className="flex gap-4 items-center">
-          <div>
-            <Badge
-              variant={"default"}
-              className="font-normal pointer-events-none"
-            >
-              Please update .env.local file with anon key and url
-            </Badge>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              asChild
-              size="sm"
-              variant={"outline"}
-              disabled
-              className="opacity-75 cursor-none pointer-events-none"
-            >
-              <Link href="/sign-in">Sign in</Link>
-            </Button>
-            <Button
-              asChild
-              size="sm"
-              variant={"default"}
-              disabled
-              className="opacity-75 cursor-none pointer-events-none"
-            >
-              <Link href="/sign-up">Sign up</Link>
-            </Button>
-          </div>
-        </div>
-      </>
-    );
-  }
-  return user ? (
+  return (
     <div className="flex items-center gap-4">
-
       <Link href="/profile">
-        <Button
-          variant={"ghost"}
-          size="sm"
-          className="font-normal hover:text-blue-500"
-        >
-          {profile.profile_name ?? profile.email ?? user.email ?? ''}
+        <Button variant={"ghost"} size="sm" className="font-normal hover:text-blue-500">
+          {profile.profile_name ?? profile.email ?? user.email ?? ""}
         </Button>
       </Link>
-
       <form action={signOutAction}>
         <Button type="submit" variant={"outline"}>
           Sign out
         </Button>
       </form>
-    </div>
-  ) : (
-    <div className="flex gap-2">
-      <Button asChild size="sm" variant={"outline"}>
-        <Link href="/sign-in">Sign in</Link>
-      </Button>
-      <Button asChild size="sm" variant={"default"}>
-        <Link href="/sign-up">Sign up</Link>
-      </Button>
     </div>
   );
 }
