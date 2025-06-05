@@ -7,6 +7,8 @@ import Link from "next/link";
 import "./globals.css";
 import Breadcrumb from "@/components/ui/breadcrumb";
 import { ToastContainer } from "react-toastify";
+import Sidebar from "@/components/ui/sidebar";  // <== new import
+
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -51,37 +53,7 @@ export default function RootLayout({
                 </div>
               </div>
             </nav>
-            <div className="flex flex-1 max-w-7xl w-full mx-auto">
-              {/* Left navigation sidebar */}
-              <aside className="w-64 bg-white shadow-sm border-r border-gray-200 p-5">
-                <nav className="flex flex-col gap-4">
-                  <Link
-                    href="/dashboard"
-                    className="text-gray-700 hover:text-blue-600"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/courses"
-                    className="text-gray-700 hover:text-blue-600"
-                  >
-                    Courses and Surveys
-                  </Link>
-                  <Link
-                    href="/profile"
-                    className="text-gray-700 hover:text-blue-600"
-                  >
-                    Profile
-                  </Link>
-                </nav>
-              </aside>
-              {/* Main content area */}
-              <div className="flex-1 p-5">
-                <Breadcrumb />
-                {children}
-                <ToastContainer position="bottom-right" autoClose={1500} limit={3} />
-                </div>
-            </div>
+            {children}
             <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
               <p>
                 Created by{" "}

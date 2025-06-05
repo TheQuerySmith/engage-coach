@@ -1,9 +1,9 @@
-export default async function Layout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="max-w-7xl flex flex-col gap-12 items-start">{children}</div>
+    <html lang="en">
+      <body className="bg-background text-foreground">
+        <main className="min-h-screen p-5">{children}</main>
+      </body>
+    </html>
   );
 }
