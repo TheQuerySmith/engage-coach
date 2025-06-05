@@ -5,9 +5,6 @@ import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
-import Breadcrumb from "@/components/ui/breadcrumb";
-import { ToastContainer } from "react-toastify";
-import Sidebar from "@/components/ui/sidebar";  // <== new import
 
 
 const defaultUrl = process.env.VERCEL_URL
