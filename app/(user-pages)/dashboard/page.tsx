@@ -195,12 +195,31 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
           false // This step is always shown when the condition is met
         )}
 
-      {/* Survey Tasks Loop: iterate over surveys 1 and 2 */}
-      {[1, 2].map((surveyNum) => {
+      {status.course_created && (
+        [1, 2].map((surveyNum) => {
         // Determine survey open date for the current survey.
         const surveyOpenDateKey = `survey${surveyNum}OpenDate` as keyof UserData;
         const surveyOpenDate = userData[surveyOpenDateKey] ? new Date(userData[surveyOpenDateKey]!) : null;
         const header = surveyNum === 1 ? survey1Header : survey2Header;
+
+        if ((!surveyOpenDate || now < surveyOpenDate) && !showAllTasks && status.course_created) {
+          return (
+            <div key={surveyNum}>
+              <h2 className="font-bold text-2xl">{header}</h2>
+              {renderStep(
+                <p className="mt-4">
+                  ⏰ Check back on{" "}
+                  {surveyOpenDate ? surveyOpenDate.toLocaleDateString() : "the scheduled date"} to complete survey {surveyNum}. You can find student survey links and change survey dates on the{" "}
+                  <Link href="/courses" className="font-bold hover:underline text-foreground/80">
+                    Courses & Surveys Page
+                  </Link>.
+                </p>,
+                false // This step is always shown when the condition is met
+              )}
+            </div>
+          );
+        }
+
 
         if (!surveyOpenDate || now < surveyOpenDate && !showAllTasks) {
           return (
@@ -289,7 +308,7 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
 
           </div>
         );
-      })}
+      }))}
 
       {/* Course-Wide Uploads 
       <h2 className="font-bold text-2xl">Course Uploads</h2>
