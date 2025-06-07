@@ -34,6 +34,10 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
         survey_n,
         open_at,
         close_at
+      ),
+      instructor_course_survey_responses (
+        survey_n,
+        updated_at
       )
     `
     )
@@ -49,13 +53,7 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
 
   // Fetch survey links using the helper function
   const instPromises = surveys.map((survey_n) =>
-    getSurveyLink({
-      surveyName: 'Instructor Course Survey 2025',
-      surveyN: survey_n,
-      instructorId: user.id,
-      courseId: course.id,
-    })
-  );
+  // Fetch survey links using the helper function for student links.
   const stuPromises = surveys.map((survey_n) =>
     getSurveyLink({
       surveyName: 'Student Course Survey 2025',
@@ -63,8 +61,6 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
       courseId: course.id,
     })
   );
-
-  const instructorLinks = await Promise.all(instPromises);
   const studentLinks = await Promise.all(stuPromises);
 
   // Build survey windows display text.
@@ -78,8 +74,10 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
       const closeDate = new Date(windowData.close_at);
       displayText = `${openDate.toLocaleDateString()} to ${closeDate.toLocaleDateString()}`;
     }
-    return { survey_n, displayText };
+    return { survey_n, displayText, windowData };
   });
+
+  const now = new Date();
 
   return (
     <div className="p-6">
@@ -121,62 +119,77 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
       <div className="mb-8">
         <h2 className="text-xl font-bold mb-4">Survey Dates &amp; Links</h2>
         <div className="mb-8">
-          {surveys.map((survey_n, index) => (
-            <div key={survey_n} className="mb-6 border p-4 rounded text-center">
-              <h3 className="text-lg font-semibold mb-2">Survey {survey_n}</h3>
-              <p className="mb-2">
-                <strong>Scheduled: </strong>{' '}
-                {surveyWindows[index] ? surveyWindows[index].displayText : 'Not set'}
-              </p>
-              <div className="flex flex-col gap-2">
-                <div>
-                  <p className="font-medium">
-                    <strong>Instructor Survey Link:</strong>{' '}
-                    {instructorLinks[index] ? (
-                      <Link
-                        href={instructorLinks[index]}
-                        className="text-blue-600 hover:underline"
-                      >
-                        Click here to take the instructor survey
-                      </Link>
-                    ) : (
-                      'Not available'
-                    )}
-                  </p>
-                </div>
-                <div>
-                  <p className="font-medium">
-                    <strong>Student Survey Link:</strong>{' '}
-                    {studentLinks[index] ? (
-                      <CopyButton
-                        copyText={studentLinks[index]}
-                        buttonLabel="Click here to copy the student survey link"
-                      />
-                    ) : (
-                      'Not available'
-                    )}
-                  </p>
-                  {studentLinks[index] && (
-                    <details>
-                      <summary className="text-gray-600 hover:underline">
-                        Show full student link
-                      </summary>
-                      <div className="mt-2">
-                        <a
-                          href={studentLinks[index]}
-                          target="_blank"
-                          rel="noopener noreferrer"
+          {surveys.map((survey_n, index) => {
+            // Get window info
+            const { windowData, displayText } = surveyWindows[index];
+            const openDate = windowData ? new Date(windowData.open_at) : null;
+            // Check if instructor has already completed this survey
+            const instructorResponse = course.instructor_course_survey_responses?.find(
+              (r: any) => r.survey_n === survey_n
+            );
+            const completed = instructorResponse != null;
+            return (
+              <div key={survey_n} className="mb-6 border p-4 rounded text-center">
+                <h3 className="text-lg font-semibold mb-2">Survey {survey_n}</h3>
+                <p className="mb-2">
+                  <strong>Scheduled: </strong>{' '}
+                  {displayText}
+                </p>
+                <div className="flex flex-col gap-2">
+                  <div>
+                    <p className="font-medium">
+                      <strong>Instructor Survey Link:</strong>{' '}
+                      {openDate && now < openDate ? (
+                        <span>
+                          Please come back on {openDate.toLocaleDateString()} to complete your survey.
+                        </span>
+                      ) : completed ? (
+                        <span>
+                          You have already completed this survey on{' '}
+                          {new Date(instructorResponse.updated_at).toLocaleDateString()}
+                        </span>
+                      ) : (
+                        <Link
+                          href={`/courses/${course.short_id}/instructor-survey/${survey_n}`}
                           className="text-blue-600 hover:underline"
                         >
-                          {studentLinks[index]}
-                        </a>
-                      </div>
-                    </details>
-                  )}
+                          Click here to take the instructor survey
+                        </Link>
+                      )}
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+  <div className="font-medium">
+    <strong>Student Survey Link:</strong>{' '}
+    {studentLinks[index] ? (
+      <CopyButton
+        copyText={studentLinks[index]}
+        buttonLabel="Click here to copy the student survey link"
+      />
+    ) : (
+      'Not available'
+    )}
+  </div>
+  {studentLinks[index] && (
+    <details className="text-gray-600 hover:underline">
+      <summary className="cursor-pointer">Show full student link</summary>
+      <div className="mt-2">
+        <a
+          href={studentLinks[index]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:underline"
+        >
+          {studentLinks[index]}
+        </a>
+      </div>
+    </details>
+  )}
+</div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
       <div className="mt-6 flex items-center gap-4">
