@@ -139,7 +139,7 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
                       <strong>Instructor Survey Link:</strong>{' '}
                       {openDate && now < openDate ? (
                         <span>
-                          Please come back on {openDate.toLocaleDateString()} to complete your survey.
+                          Please come back on {openDate.toLocaleDateString()} to complete your survey
                         </span>
                       ) : completed ? (
                         <span>
@@ -157,33 +157,33 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
-  <div className="font-medium">
-    <strong>Student Survey Link:</strong>{' '}
-    {studentLinks[index] ? (
-      <CopyButton
-        copyText={studentLinks[index]}
-        buttonLabel="Click here to copy the student survey link"
-      />
-    ) : (
-      'Not available'
-    )}
-  </div>
-  {studentLinks[index] && (
-    <details className="text-gray-600 hover:underline">
-      <summary className="cursor-pointer">Show full student link</summary>
-      <div className="mt-2">
-        <a
-          href={studentLinks[index]}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:underline"
-        >
-          {studentLinks[index]}
-        </a>
-      </div>
-    </details>
-  )}
-</div>
+                    <div className="font-medium">
+                      <strong>Student Survey Link:</strong>{' '}
+                      {studentLinks[index] ? (
+                        <CopyButton
+                          copyText={studentLinks[index]}
+                          buttonLabel="Click here to copy the student survey link"
+                        />
+                      ) : (
+                        'Not available'
+                      )}
+                    </div>
+                    {studentLinks[index] && (
+                      <details className="text-gray-600 hover:underline">
+                        <summary className="cursor-pointer">Show full student link</summary>
+                        <div className="mt-2">
+                          <a
+                            href={studentLinks[index]}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline"
+                          >
+                            {studentLinks[index]}
+                          </a>
+                        </div>
+                      </details>
+                    )}
+                  </div>
                 </div>
               </div>
             );
