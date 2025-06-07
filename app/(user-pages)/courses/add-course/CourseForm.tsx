@@ -21,7 +21,7 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
   const [pctMajors, setPctMajors] = useState(0);
   const [pctSTEM, setPctSTEM] = useState(0);
   // New dropdown fields with "Other" defaults
-  const [generalEducation, setGeneralEducation] = useState('Other');
+  const [generalEducation, setGeneralEducation] = useState('Unsure/Other');
   const [level, setLevel] = useState('Other');
   const [courseType, setCourseType] = useState('Lecture');
   const [format, setFormat] = useState('In-Person');
