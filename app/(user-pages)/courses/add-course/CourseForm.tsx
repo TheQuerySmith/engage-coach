@@ -239,7 +239,6 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Unsure/Other">Unsure/Other</option>
-          <option value="Other">Other</option>
         </select>
       </label>
       <label className="flex flex-col">

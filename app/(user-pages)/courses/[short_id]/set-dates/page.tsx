@@ -125,6 +125,12 @@ export default function SetDatesPage() {
       <h1 className="text-2xl font-bold mb-4">{course.title}</h1>
       <h2 className="text-lg font-semibold mb-4">Update Survey Dates</h2>
 
+      <p className="mb-4 text-gray-700">
+        The surveys include cutting-edge measures to assess student engagement, mindsets, and more. 
+        Below you can select the dates when you and your students will complete the surveys.
+      </p>
+      <p></p>
+
       <form onSubmit={handleSubmit} className="mb-8">
         {[1, 2].map((survey_n) => (
           <div key={survey_n}>
@@ -132,13 +138,13 @@ export default function SetDatesPage() {
               <h2 className="text-xl font-semibold mb-2">Survey {survey_n}</h2>
               {survey_n === 1 && (
                 <AddNotification 
-                  message="Select when you and your students will complete Survey 1. We recommend opening the survey after students receive their grades back from their first exam or major assignment and closing the survey approximately 1 week later."
+                  message="We recommend opening Survey 1 after students receive their grades back from their first exam or major assignment and closing the survey approximately 1 week later."
                   type="info" 
                 />
               )}
               {survey_n === 2 && (
                 <AddNotification 
-                  message="Select when you and your students will complete Survey 2. We recommend opening the survey near the last meeting time and closing the survey approximately 1 week later (at least a few days before finals)."
+                  message="We recommend opening Survey 2 near the last meeting time and closing the survey approximately 1 week later (at least a few days before finals)."
                   type="info" 
                 />
               )}
