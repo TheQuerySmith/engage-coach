@@ -51,8 +51,6 @@ export default async function CourseDetails({ params }: CourseDetailsProps) {
   // Define the surveys we support
   const surveys = [1, 2];
 
-  // Fetch survey links using the helper function
-  const instPromises = surveys.map((survey_n) =>
   // Fetch survey links using the helper function for student links.
   const stuPromises = surveys.map((survey_n) =>
     getSurveyLink({
