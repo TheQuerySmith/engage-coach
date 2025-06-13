@@ -28,17 +28,18 @@ A full-stack web application to streamline the administration, delivery, and rep
 - [ ] Documentation | View documentation and user support | Not Started |
 
  ### Improve features
- - [ ] Figure out file storage and report capabilities (https://supabase.com/docs/guides/storage/security/access-control) - user has file folder with user id
  - [ ] If courses are deleted, change to inactive rather than delete
  - [ ] Currently set up for only two survey window: need to drastically update database etc. to allow for multiple survey windows
  - [ ] Added shortcut of adding 8 weeks to second survey window defaults within supabase function
  - [ ] Pre-course Survey
- - [ ] Steps dashboard to add next steps: pull directly from database
  - [ ] Add cslx to steps for conditional formatting?
  - [ ] Refresh survey pages (see PageRefresh.tsx) to update survey status
  - [ ] Limit Participant lists to 10 per page with pagination
  - [ ] User can upload a profile picture, bio, and links (social media, personal website, etc.)
  - [ ] Create linked instructors in a community page
+ - [ ] clsx to highlight path route: https://nextjs.org/learn/dashboard-app/navigating-between-pages
+ - [ ] Add warnings on invalid sign-in credentials
+ - [ ] Make dashboard available when signed in
 
 
 ### Bug Fixes
@@ -46,14 +47,13 @@ A full-stack web application to streamline the administration, delivery, and rep
 - [ ] Email address should be validated on profile update
 - [ ] Add supabase error handling 
 - [ ] Update email doesn't update auth.users table
-- [ ] Need to create user_checklist row when user is created
+- [?] Need to create user_checklist row when user is created
 - [ ] More efficient subcomponents? (e.g., redirect within fetch-next-steps.tsx)
 - [ ] middleware.ts should redirect to signin if not logged in (not just profile)
 - [ ] Ensure users can't change their profile.id or other locked fields
 - [ ] Trim and lowercase student ids for better matching
 - [ ] In course add, weird 0 requirement when adding student numbers
 - [ ] Ensure non-overlapping survey windows
-- [ ] Gen-ed default of "Other"
 - [ ] Default survey open/close at midnight of local time
 - [ ] Create and edit courses should have explaination and correct dropdowns
 
