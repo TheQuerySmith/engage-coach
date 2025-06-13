@@ -2,13 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import EditCourseForm from './EditCourseForm';
 
-interface EditCoursePageProps {
-  params: {
-    short_id: string;
-  };
-}
-
-export default async function EditCoursePage({ params }: EditCoursePageProps) {
+export default async function EditCoursePage({ params }: { params: { short_id: string } }) {
   const { short_id } = params;
   const supabase = await createClient();
   
