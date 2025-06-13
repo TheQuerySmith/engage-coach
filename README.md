@@ -47,7 +47,6 @@ A full-stack web application to streamline the administration, delivery, and rep
 - [ ] Email address should be validated on profile update
 - [ ] Add supabase error handling 
 - [ ] Update email doesn't update auth.users table
-- [?] Need to create user_checklist row when user is created
 - [ ] More efficient subcomponents? (e.g., redirect within fetch-next-steps.tsx)
 - [ ] middleware.ts should redirect to signin if not logged in (not just profile)
 - [ ] Ensure users can't change their profile.id or other locked fields
@@ -108,21 +107,6 @@ create table profiles (
 );
 
 ##### To make a checklist of user information
-
-create table checklist_items (
-  id   serial primary key,
-  name text not null unique,
-  description text
-);
-
--- link each user → each item, with a boolean flag
-create table user_checklist (
-  user_id           uuid  references auth.users(id) on delete cascade,
-  checklist_item_id int   references checklist_items(id) on delete cascade,
-  completed         boolean not null default false,
-  completed_at      timestamptz,
-  primary key (user_id, checklist_item_id)
-);
 
 create table courses (
   id uuid primary key default gen_random_uuid(),
@@ -264,96 +248,6 @@ insert into app_settings (key,value) values
 -- NOTE: Need to allow NULL values on level/type/format: 
 -- e.g., format IS NULL OR format = ANY (ARRAY['In-Person'::text, 'Online'::text, 'Hybrid'::text, 'Other'::text])
 
-#### Making checklist view
-select
-  /* ───── WHO ───── */
-  p.id                                            as user_id,
-
-  /* ───── GLOBAL TASKS ───── */
-  p.user_edited                                   as profile_done,
-  (ac.n_active > 0)                               as course_created,
-  uc_dates.completed                              as dates_confirmed,
-  (p.consent is not null)                         as consent_done,
-
-  /* ───── SURVEY 1 ───── */
-  bool_or(sp.instructor_done)  filter (where sp.survey_n = 1)  as survey1_instructor_done,
-  bool_or(
-    sp.n_students_done >= (
-      select value::int from app_settings where key = 'min_student_responses'
-    )
-  )                               filter (where sp.survey_n = 1)  as survey1_students_done,
-  bool_or(sp.report_latest_path <> '') filter (where sp.survey_n = 1)  as survey1_report_done,
-  bool_or(ds.status = 'signed_up')   filter (where ds.survey_n = 1)     as survey1_discussion_signed,
-  bool_or(ds.status = 'opt_out')     filter (where ds.survey_n = 1)     as survey1_discussion_optout,
-
-  /* ───── SURVEY 2 ───── */
-  bool_or(sp.instructor_done)  filter (where sp.survey_n = 2)  as survey2_instructor_done,
-  bool_or(
-    sp.n_students_done >= (
-      select value::int from app_settings where key = 'min_student_responses'
-    )
-  )                               filter (where sp.survey_n = 2)  as survey2_students_done,
-  bool_or(sp.report_latest_path <> '') filter (where sp.survey_n = 2)  as survey2_report_done,
-  bool_or(ds.status = 'signed_up')   filter (where ds.survey_n = 2)     as survey2_discussion_signed,
-  bool_or(ds.status = 'opt_out')     filter (where ds.survey_n = 2)     as survey2_discussion_optout,
-
-  /* ───── COURSE-WIDE UPLOADS ───── */
-  us.grades_ok,
-  us.recordings_ok
-
-from profiles p
-left join active_courses        ac on ac.user_id = p.id
-left join user_checklist uc_dates
-       on uc_dates.user_id = p.id
-      and uc_dates.checklist_item_id = (
-        select id from checklist_items where name = 'confirm_dates'
-      )
-left join survey_progress  sp on sp.user_id = p.id
-left join discussion_signups ds on ds.user_id = p.id
-left join uploads_status   us on us.user_id = p.id
-
-/*───────────── NEW: group by every non-aggregate column ─────────────*/
-group by
-  p.id,
-  p.user_edited,
-  ac.n_active,
-  uc_dates.completed,
-  p.consent,
-  us.grades_ok,
-  us.recordings_ok;
-
-SQL Functions
-
-
-Trigger profiles_sync_email BEFORE INSTERT on profiles (ROW)
-
-```sql
-BEGIN
-  -- Only overwrite if email was not explicitly provided
-  IF NEW.email IS NULL OR NEW.email = '' OR NEW.email = 'error@error.com' THEN
-    SELECT auth.users.email
-      INTO NEW.email
-      FROM auth.users
-     WHERE auth.users.id = NEW.id;
-  END IF;
-
-  RETURN NEW;
-END;
-```
-
-Called on every insert to the profiles table. 
-```sql
-DECLARE
-  hex_part text;
-BEGIN
-  -- Generate an 8-character hex string from a random number’s MD5 hash
-  hex_part := substr(md5(random()::text), 1, 8);
-  
-  -- Prefix with whatever label you like (e.g., "member_" instead of "instructor_")
-  RETURN 'member_' || hex_part;
-END;
-
-```
 
 ### Dashboard brainstorming
 
