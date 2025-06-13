@@ -3,12 +3,13 @@ import { createClient } from '@/utils/supabase/server';
 import { getSurveyLink } from '@/utils/supabase/surveys';
 
 interface SurveyPageProps {
-  params: {
+  params: Promise<{
     N_survey: string;
-  };
+  }>;
 }
 
-export default async function SurveyPage({ params }: SurveyPageProps) {
+export default async function SurveyPage(props: SurveyPageProps) {
+  const params = await props.params;
   const supabase = await createClient();
 
   // Extract survey number from the URL parameters

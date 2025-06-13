@@ -31,10 +31,11 @@ type UserData = {
 
 // Accept search parameters to get the showAllTasks flag.
 interface TaskStatusProps {
-  searchParams?: { showAllTasks?: string };
+  searchParams?: Promise<{ showAllTasks?: string }>;
 }
 
-export default async function TaskStatus({ searchParams }: TaskStatusProps) {
+export default async function TaskStatus(props: TaskStatusProps) {
+  const searchParams = await props.searchParams;
   const supabase = await createClient();
 
   // Fetch user task status.

@@ -2,13 +2,13 @@ import { createClient } from '@/utils/supabase/server';
 import Link from 'next/link';
 
 interface SearchPageProps {
-  params: {
+  params: Promise<{
     short_id: string;
     survey_n: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     query?: string;
-  };
+  }>;
 }
 
 const statusRank: { [key: string]: number } = {
@@ -17,7 +17,9 @@ const statusRank: { [key: string]: number } = {
   'Completed': 3,
 };
 
-export default async function SearchResultsPage({ params, searchParams }: SearchPageProps) {
+export default async function SearchResultsPage(props: SearchPageProps) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { short_id } = params;
   const query = searchParams.query ? searchParams.query.trim() : '';
 
@@ -67,7 +69,7 @@ export default async function SearchResultsPage({ params, searchParams }: Search
         return sid.includes(lowerQuery) || fullName.includes(lowerQuery);
       })
     : bestResponses;
-  
+
   // Helper function to format name.
   const formatName = (resp: any) =>
     (resp.first_name || resp.last_name)

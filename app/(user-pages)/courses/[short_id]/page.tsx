@@ -6,12 +6,13 @@ import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 
 interface CourseDetailsProps {
-  params: {
+  params: Promise<{
     short_id: string;
-  };
+  }>;
 }
 
-export default async function CourseDetails({ params }: CourseDetailsProps) {
+export default async function CourseDetails(props: CourseDetailsProps) {
+  const params = await props.params;
   const { short_id } = params;
   const supabase = await createClient();
 

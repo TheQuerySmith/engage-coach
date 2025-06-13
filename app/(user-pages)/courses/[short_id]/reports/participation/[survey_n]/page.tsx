@@ -4,10 +4,10 @@ import Link from 'next/link';
 import SaveToCsvButton from '@/components/SaveCsv';
 
 interface ParticipationPageProps {
-  params: {
+  params: Promise<{
     short_id: string;
     survey_n: string;
-  };
+  }>;
 }
 
 const statusRank: { [key: string]: number } = {
@@ -16,7 +16,8 @@ const statusRank: { [key: string]: number } = {
   'Completed': 3,
 };
 
-export default async function ParticipationPage({ params }: ParticipationPageProps) {
+export default async function ParticipationPage(props: ParticipationPageProps) {
+  const params = await props.params;
   const { short_id, survey_n } = params;
   const surveyN = Number(survey_n);
   const supabase = await createClient();
