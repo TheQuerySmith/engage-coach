@@ -13,7 +13,7 @@ export default function SetDatesPage() {
   const supabase = createClient();
 
   const [course, setCourse] = useState<any>(null);
-  const [surveyWindows, setSurveyWindows] = useState<{ [key: number]: { open_at: string, close_at: string } }>({
+  const [surveyWindows, setSurveyWindows] = useState<Record<1 | 2, { open_at: string, close_at: string }>>({
     1: { open_at: '', close_at: '' },
     2: { open_at: '', close_at: '' }
   });
@@ -132,7 +132,7 @@ export default function SetDatesPage() {
       <p></p>
 
       <form onSubmit={handleSubmit} className="mb-8">
-        {[1, 2].map((survey_n) => (
+        {[1, 2].map((survey_n: 1 | 2) => (
           <div key={survey_n}>
             <div className="mb-4 border p-4 rounded">
               <h2 className="text-xl font-semibold mb-2">Survey {survey_n}</h2>
