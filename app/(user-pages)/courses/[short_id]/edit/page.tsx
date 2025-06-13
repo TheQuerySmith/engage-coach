@@ -2,11 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import EditCourseForm from './EditCourseForm';
 
-interface PageProps {
-  params: { [key: string]: string | string[] };
-}
-
-interface EditCoursePageProps extends PageProps {
+interface EditCoursePageProps {
   params: {
     short_id: string;
   };
