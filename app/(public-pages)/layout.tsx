@@ -1,5 +1,4 @@
 import Breadcrumb from "@/components/ui/breadcrumb";
-import AnonSidebar from "@/components/ui/anon-sidebar";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
