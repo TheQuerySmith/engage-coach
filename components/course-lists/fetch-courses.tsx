@@ -5,9 +5,17 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+interface Course {
+  title: string;
+  short_id: string;
+  id: string;
+  department: string;
+  number_code: string;
+}
+
 export default function CourseList() {
-  const [courses, setCourses] = useState([]);
-  const [error, setError] = useState(null);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -31,7 +39,7 @@ export default function CourseList() {
 
       if (fetchError) {
         setError(fetchError.message);
-      } else {
+      } else if (data) {
         setCourses(data);
       }
     };

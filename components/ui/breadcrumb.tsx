@@ -26,7 +26,7 @@ export default function Breadcrumb() {
         }
       })();
     }
-  }, [segments.join()], supabase);
+  }, [segments.join(), supabase]);
 
   let pathAccumulator = '';
   return (

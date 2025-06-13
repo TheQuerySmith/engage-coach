@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { pollForSurveyCompletion } from '@/utils/supabase/refresh-if-completed';
+import { pollForSurveyCompletion } from '@/utils/supabase/refresh';
 
 export default function PageWithPoll({
   surveyRecordId,

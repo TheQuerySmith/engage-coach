@@ -6,6 +6,11 @@ import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import AddNotification from "@/components/ui/notification-ribbon";
 
+interface WindowRange {
+  open_at: string;
+  close_at: string;
+}
+
 export default function SetDatesPage() {
   const router = useRouter();
   const params = useParams();
@@ -13,7 +18,7 @@ export default function SetDatesPage() {
   const supabase = createClient();
 
   const [course, setCourse] = useState<any>(null);
-  const [surveyWindows, setSurveyWindows] = useState<Record<1 | 2, { open_at: string, close_at: string }>>({
+  const [surveyWindows, setSurveyWindows] = useState<Record<number, WindowRange>>({
     1: { open_at: '', close_at: '' },
     2: { open_at: '', close_at: '' }
   });
@@ -50,17 +55,20 @@ export default function SetDatesPage() {
       }
       setCourse(data);
 
-      // Initialize survey windows state from fetched data (if available)
-      const initialWindows = { 1: { open_at: '', close_at: '' }, 2: { open_at: '', close_at: '' } };
+      // Use looser types for survey windows extraction.
+      const initialWindows: Record<number, WindowRange> = {
+        1: { open_at: '', close_at: '' },
+        2: { open_at: '', close_at: '' }
+      };
       if (data.course_survey_windows) {
-        data.course_survey_windows.forEach((w: any) => {
-          if (w.survey_n === 1 || w.survey_n === 2) {
+        data.course_survey_windows.forEach(
+          (w: { survey_n: number; open_at?: string; close_at?: string }) => {
             initialWindows[w.survey_n] = {
-              open_at: w.open_at ? new Date(w.open_at).toISOString().slice(0,16) : '',
-              close_at: w.close_at ? new Date(w.close_at).toISOString().slice(0,16) : ''
+              open_at: w.open_at ? new Date(w.open_at).toISOString().slice(0, 16) : '',
+              close_at: w.close_at ? new Date(w.close_at).toISOString().slice(0, 16) : '',
             };
           }
-        });
+        );
       }
       setSurveyWindows(initialWindows);
       setLoading(false);
@@ -69,7 +77,7 @@ export default function SetDatesPage() {
     fetchCourse();
   }, [short_id, router, supabase]);
 
-  const handleChange = (survey_n: number, field: 'open_at' | 'close_at', value: string) => {
+  const handleChange = (survey_n: number, field: keyof WindowRange, value: string) => {
     setSurveyWindows(prev => ({
       ...prev,
       [survey_n]: {
@@ -115,11 +123,6 @@ export default function SetDatesPage() {
   if (loading) return <p>Loading...</p>;
   if (error) return <p className="text-red-600">{error}</p>;
 
-  // Construct links.
-  // For instructor, we assume an internal link to the instructor survey page.
-  // For students, we use the Qualtrics link base.
-  const qualtricsBase = "https://utexas.qualtrics.com/jfe/form/SV_b7PqMufNgIi0Jjo";
-
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">{course.title}</h1>
@@ -129,10 +132,9 @@ export default function SetDatesPage() {
         The surveys include cutting-edge measures to assess student engagement, mindsets, and more. 
         Below you can select the dates when you and your students will complete the surveys.
       </p>
-      <p></p>
 
       <form onSubmit={handleSubmit} className="mb-8">
-        {[1, 2].map((survey_n: 1 | 2) => (
+        {[1, 2].map((survey_n: number) => (
           <div key={survey_n}>
             <div className="mb-4 border p-4 rounded">
               <h2 className="text-xl font-semibold mb-2">Survey {survey_n}</h2>

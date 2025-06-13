@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { TutorialStep } from "./TutorialStep";
 import Link from "next/link";
 import AddNotification from "@/components/ui/notification-ribbon";
+import React from 'react';
 
 // Define types.
 type TaskStatusRow = {
@@ -123,7 +124,7 @@ export default async function TaskStatus(props: TaskStatusProps) {
   const showAllTasks = searchParams?.showAllTasks === "true";
 
   // Helper: render a TutorialStep only if not completed (or if showAllTasks is true).
-  const renderStep = (step: JSX.Element, completed: boolean, displayCondition: boolean = true) => {
+  const renderStep = (step: React.JSX.Element, completed: boolean, displayCondition: boolean = true) => {
     return (!completed || showAllTasks) && displayCondition ? step : null;
   };
 
