@@ -88,7 +88,6 @@ select
   /* ───── GLOBAL TASKS ───── */
   p.user_edited                                   as profile_done,
   (ac.n_active > 0)                               as course_created,
-  uc_dates.completed                              as dates_confirmed,
   (p.consent is not null)                         as consent_done,
 
   /* ───── SURVEY 1 ───── */
@@ -119,21 +118,13 @@ select
 
 from profiles p
 left join active_courses        ac on ac.user_id = p.id
-left join user_checklist uc_dates
-       on uc_dates.user_id = p.id
-      and uc_dates.checklist_item_id = (
-        select id from checklist_items where name = 'confirm_dates'
-      )
-left join survey_progress  sp on sp.user_id = p.id
-left join discussion_signups ds on ds.user_id = p.id
-left join uploads_status   us on us.user_id = p.id
-
-/*───────────── NEW: group by every non-aggregate column ─────────────*/
+left join survey_progress         sp on sp.user_id = p.id
+left join discussion_signups     ds on ds.user_id = p.id
+left join uploads_status         us on us.user_id = p.id
 group by
   p.id,
   p.user_edited,
   ac.n_active,
-  uc_dates.completed,
   p.consent,
   us.grades_ok,
   us.recordings_ok;

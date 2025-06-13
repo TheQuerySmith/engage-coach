@@ -7,7 +7,6 @@ import AddNotification from "@/components/ui/notification-ribbon";
 type TaskStatusRow = {
   profile_done: boolean;
   course_created: boolean;
-  dates_confirmed: boolean;
   consent_done: boolean;
   survey1_instructor_done: boolean;
   survey1_students_done: boolean;
@@ -44,7 +43,6 @@ export default async function TaskStatus({ searchParams }: TaskStatusProps) {
     .select(`
        profile_done,
        course_created,
-       dates_confirmed,
        consent_done,
        survey1_instructor_done,
        survey1_students_done,
