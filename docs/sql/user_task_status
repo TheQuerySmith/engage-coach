@@ -1,0 +1,139 @@
+/*------------------------------------------------------------
+  USER-LEVEL “WHAT HAVE I DONE?” SNAPSHOT
+------------------------------------------------------------*/
+create or replace view user_task_status as
+with
+/*------------------------------------------------------------
+  1. ACTIVE_COURSES  → count of active courses per instructor
+------------------------------------------------------------*/
+active_courses as (
+  select
+    user_id,
+    count(*)::int as n_active
+  from courses
+  where is_active
+  group by user_id
+),
+
+/*------------------------------------------------------------
+  2. SURVEY_PROGRESS  → per-course, per-survey snapshot
+------------------------------------------------------------*/
+survey_progress as (
+  select
+    c.user_id,
+    csr.survey_n,
+    bool_or(csr.status = 'Completed')                 as instructor_done,
+    count(distinct scr.id)                            as n_students_done,
+    coalesce(
+      (select supabase_path
+         from user_reports r
+        where r.course_id = csr.course_id
+          and r.survey_n  = csr.survey_n
+        order by generated_at desc
+        limit 1),
+      ''
+    )                                                 as report_latest_path
+  from courses c
+  join instructor_course_survey_responses csr
+       on csr.course_id = c.id
+  left join student_course_survey_responses scr
+       on scr.course_id = c.id
+      and scr.survey_n  = csr.survey_n
+      and scr.status    = 'Completed'
+  where c.is_active
+  group by c.user_id, csr.survey_n, csr.course_id
+),
+
+/*------------------------------------------------------------
+  3. UPLOADS_PER_COURSE  → how many grade files / recordings per course
+------------------------------------------------------------*/
+uploads_per_course as (
+  select
+    course_id,
+    count(*) filter (where file_type = 'grade_csv' and not is_deleted)      as grade_files,
+    count(*) filter (where file_type like 'recording_%' and not is_deleted) as recordings
+  from user_uploads
+  group by course_id
+),
+
+/*------------------------------------------------------------
+  4. UPLOADS_STATUS  → collapse to instructor-level booleans
+------------------------------------------------------------*/
+uploads_status as (
+  select
+    c.user_id,
+    /* TRUE only if every active course has ≥1 grade file */
+    bool_and(upc.grade_files > 0)                                            as grades_ok,
+    /* TRUE only if every active course meets the recordings threshold */
+    bool_and(
+      upc.recordings >= (
+        select value::int
+        from app_settings
+        where key = 'min_recordings_per_course'
+      )
+    )                                                                        as recordings_ok
+  from courses c
+  left join uploads_per_course upc on upc.course_id = c.id
+  where c.is_active
+  group by c.user_id
+)
+
+/*------------------------------------------------------------
+  5. FINAL SELECT  → one row per instructor
+------------------------------------------------------------*/
+select
+  /* ───── WHO ───── */
+  p.id                                            as user_id,
+
+  /* ───── GLOBAL TASKS ───── */
+  p.user_edited                                   as profile_done,
+  (ac.n_active > 0)                               as course_created,
+  uc_dates.completed                              as dates_confirmed,
+  (p.consent is not null)                         as consent_done,
+
+  /* ───── SURVEY 1 ───── */
+  bool_or(sp.instructor_done)  filter (where sp.survey_n = 1)  as survey1_instructor_done,
+  bool_or(
+    sp.n_students_done >= (
+      select value::int from app_settings where key = 'min_student_responses'
+    )
+  )                               filter (where sp.survey_n = 1)  as survey1_students_done,
+  bool_or(sp.report_latest_path <> '') filter (where sp.survey_n = 1)  as survey1_report_done,
+  bool_or(ds.status = 'signed_up')   filter (where ds.survey_n = 1)     as survey1_discussion_signed,
+  bool_or(ds.status = 'opt_out')     filter (where ds.survey_n = 1)     as survey1_discussion_optout,
+
+  /* ───── SURVEY 2 ───── */
+  bool_or(sp.instructor_done)  filter (where sp.survey_n = 2)  as survey2_instructor_done,
+  bool_or(
+    sp.n_students_done >= (
+      select value::int from app_settings where key = 'min_student_responses'
+    )
+  )                               filter (where sp.survey_n = 2)  as survey2_students_done,
+  bool_or(sp.report_latest_path <> '') filter (where sp.survey_n = 2)  as survey2_report_done,
+  bool_or(ds.status = 'signed_up')   filter (where ds.survey_n = 2)     as survey2_discussion_signed,
+  bool_or(ds.status = 'opt_out')     filter (where ds.survey_n = 2)     as survey2_discussion_optout,
+
+  /* ───── COURSE-WIDE UPLOADS ───── */
+  us.grades_ok,
+  us.recordings_ok
+
+from profiles p
+left join active_courses        ac on ac.user_id = p.id
+left join user_checklist uc_dates
+       on uc_dates.user_id = p.id
+      and uc_dates.checklist_item_id = (
+        select id from checklist_items where name = 'confirm_dates'
+      )
+left join survey_progress  sp on sp.user_id = p.id
+left join discussion_signups ds on ds.user_id = p.id
+left join uploads_status   us on us.user_id = p.id
+
+/*───────────── NEW: group by every non-aggregate column ─────────────*/
+group by
+  p.id,
+  p.user_edited,
+  ac.n_active,
+  uc_dates.completed,
+  p.consent,
+  us.grades_ok,
+  us.recordings_ok;

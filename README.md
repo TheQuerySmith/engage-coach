@@ -56,6 +56,8 @@ A full-stack web application to streamline the administration, delivery, and rep
 - [ ] Ensure non-overlapping survey windows
 - [ ] Default survey open/close at midnight of local time
 - [ ] Create and edit courses should have explaination and correct dropdowns
+- [ ] RLS policies (user_ulpoads, user_reports, discussion_signups) need RLS policies
+- [ ] Delete old dashboad tables (checklist_items, user_checklilst)
 
 ### Refactoring
 - [ ] Remove unnessary effects
