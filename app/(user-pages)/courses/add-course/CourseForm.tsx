@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import { toast } from "react-toastify";
 
 // Shared UI components
 import { Label } from "@/components/ui/label";
@@ -37,10 +38,14 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
 
   // Step management
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 3;
+  const totalSteps = 4;
+  const [step4Visited, setStep4Visited] = useState(false);
 
   const nextStep = () => {
     if (currentStep < totalSteps) {
+      if (currentStep === 3) {
+        setStep4Visited(true);
+      }
       setCurrentStep(currentStep + 1);
     }
   };
@@ -55,14 +60,16 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
     setCurrentStep(step);
   };
 
-  const isStepComplete = (step: number) => {
+  const isStepComplete = (step: number): boolean => {
     switch (step) {
       case 1:
         return title.trim() !== '' && department.trim() !== '' && numberCode.trim() !== '';
       case 2:
-        return pctInstructorDecision > 0 || pctInstructorSynchronous > 0 || pctInstructorAsynchronous > 0;
+        return pctInstructorDecision > 0 && pctInstructorSynchronous > 0 && pctInstructorAsynchronous > 0;
       case 3:
         return nStudents > 0;
+      case 4:
+        return isStepComplete(1) && isStepComplete(2) && isStepComplete(3);
       default:
         return false;
     }
@@ -73,22 +80,35 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-medium">Section {currentStep} of {totalSteps}</h2>
         <div className="flex space-x-2">
-          {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
-            <button
-              key={step}
-              type="button"
-              onClick={() => goToStep(step)}
-              className={`w-8 h-8 rounded-full text-sm font-medium transition-colors ${
-                step === currentStep
-                  ? 'bg-primary text-primary-foreground'
-                  : step < currentStep || isStepComplete(step)
-                  ? 'bg-green-500 text-white'
-                  : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-              }`}
-            >
-              {step < currentStep || isStepComplete(step) ? '✓' : step}
-            </button>
-          ))}
+          {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => {
+            const completed = isStepComplete(step);
+            const isPast = step < currentStep;
+
+            let classes = 'w-8 h-8 rounded-full text-sm font-medium flex items-center justify-center transition-colors ';
+            let label: React.ReactNode = step;
+
+            if (step === currentStep) {
+              classes += 'bg-primary text-primary-foreground';
+            } else if (isPast && completed) {
+              classes += 'bg-green-500 text-white';
+              label = '✓';
+            } else if (isPast && !completed) {
+              classes += 'bg-red-500 text-white';
+            } else {
+              classes += 'bg-gray-200 text-gray-600 hover:bg-gray-300';
+            }
+
+            return (
+              <button
+                key={step}
+                type="button"
+                onClick={() => goToStep(step)}
+                className={classes}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2">
@@ -271,108 +291,105 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
 
       case 3:
         return (
-          <>
-            <fieldset className="space-y-6">
-              <legend className="text-2xl font-semibold">Student Population</legend>
+          <fieldset className="space-y-6">
+            <legend className="text-2xl font-semibold">Student Population</legend>
 
-              {/* Number of Students */}
-              <div className="flex items-center gap-4">
-                <Label htmlFor="nStudents">How many students are expected enroll across all sections?</Label>
-                <Input
-                  id="nStudents"
-                  type="number"
-                  min="0"
-                  value={nStudents === 0 ? '' : nStudents}
-                  onChange={(e) => setNStudents(Number(e.target.value) || 0)}
-                  placeholder="0-9999"
-                  className="max-w-xs"
-                />
-              </div>
+            {/* Number of Students */}
+            <div className="flex items-center gap-4">
+              <Label htmlFor="nStudents">How many students are expected enroll across all sections?</Label>
+              <Input
+                id="nStudents"
+                type="number"
+                min="0"
+                value={nStudents === 0 ? '' : nStudents}
+                onChange={(e) => setNStudents(Number(e.target.value) || 0)}
+                placeholder="0-9999"
+                className="max-w-xs"
+              />
+            </div>
 
-              {/* Percentage Majors */}
-              <div className="flex items-center gap-4">
-                <Label htmlFor="pctMajors">% majors in course department</Label>
-                <Input
-                  id="pctMajors"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={pctMajors === 0 ? '' : pctMajors}
-                  onChange={(e) => setPctMajors(Number(e.target.value) || 0)}
-                  placeholder="0-100"
-                  className="max-w-20"
-                />
-                <span className="text-sm text-muted-foreground">%</span>
-              </div>
+            {/* Percentage Majors */}
+            <div className="flex items-center gap-4">
+              <Label htmlFor="pctMajors">% majors in course department</Label>
+              <Input
+                id="pctMajors"
+                type="number"
+                min="0"
+                max="100"
+                value={pctMajors === 0 ? '' : pctMajors}
+                onChange={(e) => setPctMajors(Number(e.target.value) || 0)}
+                placeholder="0-100"
+                className="max-w-20"
+              />
+              <span className="text-sm text-muted-foreground">%</span>
+            </div>
 
-              {/* Percentage STEM */}
-              <div className="flex items-center gap-4">
-                <Label htmlFor="pctSTEM">% STEM majors (any department)</Label>
-                <Input
-                  id="pctSTEM"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={pctSTEM === 0 ? '' : pctSTEM}
-                  onChange={(e) => setPctSTEM(Number(e.target.value) || 0)}
-                  placeholder="0-100"
-                  className="max-w-20"
-                />
-                <span className="text-sm text-muted-foreground">%</span>
-              </div>
+            {/* Percentage STEM */}
+            <div className="flex items-center gap-4">
+              <Label htmlFor="pctSTEM">% STEM majors (any department)</Label>
+              <Input
+                id="pctSTEM"
+                type="number"
+                min="0"
+                max="100"
+                value={pctSTEM === 0 ? '' : pctSTEM}
+                onChange={(e) => setPctSTEM(Number(e.target.value) || 0)}
+                placeholder="0-100"
+                className="max-w-20"
+              />
+              <span className="text-sm text-muted-foreground">%</span>
+            </div>
 
-              {/* General Education */}
-              <div className="flex items-center gap-4">
-                <Label htmlFor="generalEducation">General-education requirement?</Label>
-                <select
-                  id="generalEducation"
-                  value={generalEducation}
-                  onChange={(e) => setGeneralEducation(e.target.value)}
-                  className="max-w-xs h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                >
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                  <option value="Unsure/Other">Unsure / Other</option>
-                </select>
-              </div>
+            {/* General Education */}
+            <div className="flex items-center gap-4">
+              <Label htmlFor="generalEducation">General-education requirement?</Label>
+              <select
+                id="generalEducation"
+                value={generalEducation}
+                onChange={(e) => setGeneralEducation(e.target.value)}
+                className="max-w-xs h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+                <option value="Unsure/Other">Unsure / Other</option>
+              </select>
+            </div>
 
-              {/* Level */}
-              <div className="flex items-center gap-4">
-                <Label htmlFor="level">Course level</Label>
-                <select
-                  id="level"
-                  value={level}
-                  onChange={(e) => setLevel(e.target.value)}
-                  className="max-w-xs h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                >
-                  <option value="Introductory Undergraduate">Introductory Undergraduate</option>
-                  <option value="Advanced Undergraduate">Advanced Undergraduate</option>
-                  <option value="Graduate">Graduate</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
+            {/* Level */}
+            <div className="flex items-center gap-4">
+              <Label htmlFor="level">Course level</Label>
+              <select
+                id="level"
+                value={level}
+                onChange={(e) => setLevel(e.target.value)}
+                className="max-w-xs h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="Introductory Undergraduate">Introductory Undergraduate</option>
+                <option value="Advanced Undergraduate">Advanced Undergraduate</option>
+                <option value="Graduate">Graduate</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
 
-            </fieldset>
+          </fieldset>
+        );
 
-            {/* Additional Information */}
-            <fieldset className="space-y-6 mt-10">
-              <legend className="text-2xl font-semibold">Additional Information</legend>
+      case 4:
+        return (
+          <fieldset className="space-y-6">
+            <legend className="text-2xl font-semibold">Additional Information</legend>
 
-              <div className="space-y-1">
-                <Label htmlFor="additionalInfo">Anything else we should know?</Label>
-                <textarea
-                  id="additionalInfo"
-                  value={additionalInfo}
-                  onChange={(e) => setAdditionalInfo(e.target.value)}
-                  rows={4}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                />
-                <p className="text-sm text-muted-foreground">
-                  (Optional) Provide any context or details not captured above.
-                </p>
-              </div>
-            </fieldset>
-          </>
+            <div className="space-y-1">
+              <Label htmlFor="additionalInfo">Anything else that would be helpful for us to know about your course or students? (Optional)</Label>
+              <textarea
+                id="additionalInfo"
+                value={additionalInfo}
+                onChange={(e) => setAdditionalInfo(e.target.value)}
+                rows={4}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              />
+            </div>
+          </fieldset>
         );
 
       default:
@@ -397,11 +414,13 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
             type="button"
             onClick={nextStep}
             disabled={!isStepComplete(currentStep)}
+            title={!isStepComplete(currentStep) ? 'Please update course information before continuing' : undefined}
+            className={!isStepComplete(currentStep) ? 'disabled:pointer-events-auto' : ''}
           >
             Next
           </Button>
         ) : (
-          <Button type="submit" disabled={!isStepComplete(3)}>
+          <Button type="submit" disabled={!isStepComplete(4)}>
             Add Course
           </Button>
         )}
