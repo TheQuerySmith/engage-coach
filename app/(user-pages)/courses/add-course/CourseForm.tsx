@@ -12,9 +12,10 @@ import { Button } from "@/components/ui/button";
 
 interface CourseFormProps {
   onSuccess: (message: string) => void;
+  onMetaChange?: (info: { title: string; department: string; numberCode: string }) => void;
 }
 
-export default function CourseForm({ onSuccess }: CourseFormProps) {
+export default function CourseForm({ onSuccess, onMetaChange }: CourseFormProps) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -427,6 +428,13 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
       </div>
     </div>
   );
+
+  // Notify parent when core meta fields change
+  useEffect(() => {
+    if (onMetaChange) {
+      onMetaChange({ title, department, numberCode });
+    }
+  }, [title, department, numberCode, onMetaChange]);
 
   useEffect(() => {
     async function fetchDepartment() {
