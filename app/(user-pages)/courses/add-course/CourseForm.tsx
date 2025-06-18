@@ -1,8 +1,13 @@
 'use client';
 
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+
+// Shared UI components
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface CourseFormProps {
   onSuccess: (message: string) => void;
@@ -30,6 +35,380 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
   const [pctInstructorSynchronous, setPctInstructorSynchronous] = useState(0);
   const [pctInstructorAsynchronous, setPctInstructorAsynchronous] = useState(0);
 
+  // Step management
+  const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 3;
+
+  const nextStep = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const goToStep = (step: number) => {
+    setCurrentStep(step);
+  };
+
+  const isStepComplete = (step: number) => {
+    switch (step) {
+      case 1:
+        return title.trim() !== '' && department.trim() !== '' && numberCode.trim() !== '';
+      case 2:
+        return pctInstructorDecision > 0 || pctInstructorSynchronous > 0 || pctInstructorAsynchronous > 0;
+      case 3:
+        return nStudents > 0;
+      default:
+        return false;
+    }
+  };
+
+  const renderStepIndicator = () => (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-medium">Section {currentStep} of {totalSteps}</h2>
+        <div className="flex space-x-2">
+          {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
+            <button
+              key={step}
+              type="button"
+              onClick={() => goToStep(step)}
+              className={`w-8 h-8 rounded-full text-sm font-medium transition-colors ${
+                step === currentStep
+                  ? 'bg-primary text-primary-foreground'
+                  : step < currentStep || isStepComplete(step)
+                  ? 'bg-green-500 text-white'
+                  : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+              }`}
+            >
+              {step < currentStep || isStepComplete(step) ? '✓' : step}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="w-full bg-gray-200 rounded-full h-2">
+        <div
+          className="bg-primary h-2 rounded-full transition-all duration-300"
+          style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+        />
+      </div>
+    </div>
+  );
+
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <fieldset className="space-y-6">
+            <legend className="text-2xl font-semibold">Basic Information</legend>
+
+            {/* Course Title */}
+            <div className="flex items-center gap-4">
+              <Label htmlFor="title">Informal Course Title:</Label>
+              <Input
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g., Introduction to Organic Chemistry"
+                className="max-w-80"
+                required
+              />
+              <p className="text-sm text-muted-foreground">
+                (How students refer to the course)
+              </p>
+            </div>
+
+            {/* Department */}
+            <div className="flex items-center gap-4">
+              <Label htmlFor="department">Department:</Label>
+              <Input
+                id="department"
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+                placeholder="e.g., CHEM"
+                className="max-w-24"
+              />
+              <p className="text-sm text-muted-foreground">
+                (2-5 letter department abbreviation)
+              </p>
+            </div>
+
+            {/* Course Code */}
+            <div className="flex items-center gap-4">
+              <Label htmlFor="numberCode">Course Number:</Label>
+              <Input
+                id="numberCode"
+                value={numberCode}
+                onChange={(e) => setNumberCode(e.target.value)}
+                placeholder="e.g., 101"
+                className="max-w-20"
+              />
+            </div>
+
+            {/* Sections */}
+            <div className="flex items-center gap-4">
+              <Label htmlFor="nSections">How many sections will you teach this term?</Label>
+              <Input
+                id="nSections"
+                type="number"
+                min="1"
+                value={nSections}
+                onChange={(e) => setNSections(Number(e.target.value))}
+                className="max-w-20"
+              />
+            </div>
+
+            {/* Type */}
+            <div className="flex items-center gap-4">
+                <Label htmlFor="courseType">What type of course is this? </Label>
+                <select
+                  id="courseType"
+                  value={courseType}
+                  onChange={(e) => setCourseType(e.target.value)}
+                  className="max-w-xs h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value="Lecture">Lecture</option>
+                  <option value="Lab">Lab</option>
+                  <option value="Seminar/Discussion">Seminar / Discussion</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+            {/* Format */}
+            <div className="flex items-center gap-4">
+              <Label htmlFor="format">How will students primarily engage with the course?</Label>
+              <select
+                id="format"
+                value={format}
+                onChange={(e) => setFormat(e.target.value)}
+                className="max-w-xs h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="In-Person">In-Person</option>
+                <option value="Online">Online</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+          </fieldset>
+        );
+
+      case 2:
+        return (
+          <fieldset className="space-y-6">
+            <legend className="text-2xl font-semibold">Instructor Role</legend>
+
+            <p className="text-sm text-muted-foreground">
+              What percent of the following is led by <strong>you</strong> personally? (i.e., not TAs or other instructors)
+            </p>
+
+            {/* Instructor Decision Percentage */}
+            <div className="space-y-1">
+              <Label htmlFor="pctInstructorDecision">
+                I am responsible for teaching decisions in the course (e.g., syllabi, content)
+              </Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="pctInstructorDecision"
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={pctInstructorDecision === 0 ? '' : pctInstructorDecision}
+                  onChange={(e) => setPctInstructorDecision(Number(e.target.value) || 0)}
+                  placeholder="0-100"
+                  className="max-w-20"
+                />
+                <span className="text-sm text-muted-foreground">%</span>
+              </div>
+            </div>
+
+            {/* Synchronous Percentage */}
+            <div className="space-y-1">
+              <Label htmlFor="pctInstructorSynchronous">
+                I am responsible for synchronous contact time (e.g., lecture, lab, office hours)
+              </Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="pctInstructorSynchronous"
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={pctInstructorSynchronous === 0 ? '' : pctInstructorSynchronous}
+                  onChange={(e) => setPctInstructorSynchronous(Number(e.target.value) || 0)}
+                  placeholder="0-100"
+                  className="max-w-20"
+                />
+                <span className="text-sm text-muted-foreground">%</span>
+              </div>
+            </div>
+
+            {/* Asynchronous Percentage */}
+            <div className="space-y-1">
+              <Label htmlFor="pctInstructorAsynchronous">
+                I am responsible for asynchronous contact time (e.g., recorded lectures, emails)
+              </Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="pctInstructorAsynchronous"
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={pctInstructorAsynchronous === 0 ? '' : pctInstructorAsynchronous}
+                  onChange={(e) => setPctInstructorAsynchronous(Number(e.target.value) || 0)}
+                  placeholder="0-100"
+                  className="max-w-20"
+                />
+                <span className="text-sm text-muted-foreground">%</span>
+              </div>
+            </div>
+          </fieldset>
+        );
+
+      case 3:
+        return (
+          <>
+            <fieldset className="space-y-6">
+              <legend className="text-2xl font-semibold">Student Population</legend>
+
+              {/* Number of Students */}
+              <div className="flex items-center gap-4">
+                <Label htmlFor="nStudents">How many students are expected enroll across all sections?</Label>
+                <Input
+                  id="nStudents"
+                  type="number"
+                  min="0"
+                  value={nStudents === 0 ? '' : nStudents}
+                  onChange={(e) => setNStudents(Number(e.target.value) || 0)}
+                  placeholder="0-9999"
+                  className="max-w-xs"
+                />
+              </div>
+
+              {/* Percentage Majors */}
+              <div className="flex items-center gap-4">
+                <Label htmlFor="pctMajors">% majors in course department</Label>
+                <Input
+                  id="pctMajors"
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={pctMajors === 0 ? '' : pctMajors}
+                  onChange={(e) => setPctMajors(Number(e.target.value) || 0)}
+                  placeholder="0-100"
+                  className="max-w-20"
+                />
+                <span className="text-sm text-muted-foreground">%</span>
+              </div>
+
+              {/* Percentage STEM */}
+              <div className="flex items-center gap-4">
+                <Label htmlFor="pctSTEM">% STEM majors (any department)</Label>
+                <Input
+                  id="pctSTEM"
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={pctSTEM === 0 ? '' : pctSTEM}
+                  onChange={(e) => setPctSTEM(Number(e.target.value) || 0)}
+                  placeholder="0-100"
+                  className="max-w-20"
+                />
+                <span className="text-sm text-muted-foreground">%</span>
+              </div>
+
+              {/* General Education */}
+              <div className="flex items-center gap-4">
+                <Label htmlFor="generalEducation">General-education requirement?</Label>
+                <select
+                  id="generalEducation"
+                  value={generalEducation}
+                  onChange={(e) => setGeneralEducation(e.target.value)}
+                  className="max-w-xs h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                  <option value="Unsure/Other">Unsure / Other</option>
+                </select>
+              </div>
+
+              {/* Level */}
+              <div className="flex items-center gap-4">
+                <Label htmlFor="level">Course level</Label>
+                <select
+                  id="level"
+                  value={level}
+                  onChange={(e) => setLevel(e.target.value)}
+                  className="max-w-xs h-10 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value="Introductory Undergraduate">Introductory Undergraduate</option>
+                  <option value="Advanced Undergraduate">Advanced Undergraduate</option>
+                  <option value="Graduate">Graduate</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+            </fieldset>
+
+            {/* Additional Information */}
+            <fieldset className="space-y-6 mt-10">
+              <legend className="text-2xl font-semibold">Additional Information</legend>
+
+              <div className="space-y-1">
+                <Label htmlFor="additionalInfo">Anything else we should know?</Label>
+                <textarea
+                  id="additionalInfo"
+                  value={additionalInfo}
+                  onChange={(e) => setAdditionalInfo(e.target.value)}
+                  rows={4}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                />
+                <p className="text-sm text-muted-foreground">
+                  (Optional) Provide any context or details not captured above.
+                </p>
+              </div>
+            </fieldset>
+          </>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const renderNavigation = () => (
+    <div className="flex justify-between items-center mt-8 pt-6 border-t">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={prevStep}
+        disabled={currentStep === 1}
+      >
+        Previous
+      </Button>
+
+      <div className="flex space-x-2">
+        {currentStep < totalSteps ? (
+          <Button
+            type="button"
+            onClick={nextStep}
+            disabled={!isStepComplete(currentStep)}
+          >
+            Next
+          </Button>
+        ) : (
+          <Button type="submit" disabled={!isStepComplete(3)}>
+            Add Course
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+
   useEffect(() => {
     async function fetchDepartment() {
       const {
@@ -53,6 +432,17 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // If the user is not on the final step, treat "Enter" as "Next"
+    if (currentStep < totalSteps) {
+      if (isStepComplete(currentStep)) {
+        nextStep();
+      } else {
+        alert("Please complete the current section before continuing.");
+      }
+      return; // Do NOT submit yet
+    }
+
+    // Final step – proceed with actual submission
     const {
       data: { user },
       error: userError,
@@ -100,193 +490,10 @@ export default function CourseForm({ onSuccess }: CourseFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <h2 className="text-2xl font-semibold mb-4">Basic Information</h2>
-      <label className="flex flex-col">
-        Title:
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="border p-2 rounded"
-          required
-        />
-      </label>
-      <label className="flex flex-col">
-        Department:
-        <input
-          type="text"
-          value={department}
-          onChange={(e) => setDepartment(e.target.value)}
-          className="border p-2 rounded"
-        />
-      </label>
-      <label className="flex flex-col">
-        Course Number Code:
-        <input
-          type="text"
-          value={numberCode}
-          onChange={(e) => setNumberCode(e.target.value)}
-          className="border p-2 rounded"
-        />
-      </label>
-      <label className="flex flex-col">
-        Number of Sections:
-        <input
-          type="number"
-          value={nSections}
-          onChange={(e) => setNSections(Number(e.target.value))}
-          className="border p-2 rounded"
-          min={1}
-          required
-        />
-      </label>
-
-      <hr className="my-8 border-t-2 border-gray-300" />
-      <h2 className="text-2xl font-semibold mb-4">Course Format</h2>
-      <label className="flex flex-col">
-        Format:
-        <select
-          value={format}
-          onChange={(e) => setFormat(e.target.value)}
-          className="border p-2 rounded"
-        >
-          <option value="In-Person">In-Person</option>
-          <option value="Online">Online</option>
-          <option value="Hybrid">Hybrid</option>
-          <option value="Other">Other</option>
-        </select>
-      </label>
-      <label className="flex flex-col">
-        Percentage Instructor Decision: {pctInstructorDecision}%
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={pctInstructorDecision}
-          onChange={(e) => setPctInstructorDecision(Number(e.target.value))}
-          className="accent-blue-600"
-        />
-      </label>
-      <label className="flex flex-col">
-        Percentage Instructor Synchronous: {pctInstructorSynchronous}%
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={pctInstructorSynchronous}
-          onChange={(e) =>
-            setPctInstructorSynchronous(Number(e.target.value))
-          }
-          className="accent-blue-600"
-        />
-      </label>
-      <label className="flex flex-col">
-        Percentage Instructor Asynchronous: {pctInstructorAsynchronous}%
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={pctInstructorAsynchronous}
-          onChange={(e) =>
-            setPctInstructorAsynchronous(Number(e.target.value))
-          }
-          className="accent-blue-600"
-        />
-      </label>
-
-      <hr className="my-8 border-t-2 border-gray-300" />
-      <h2 className="text-2xl font-semibold mb-4">Student Population</h2>
-      <label className="flex flex-col">
-        Number of Students:
-        <input
-          type="number"
-          value={nStudents}
-          onChange={(e) => setNStudents(Number(e.target.value))}
-          className="border p-2 rounded"
-          min={0}
-        />
-      </label>
-      <label className="flex flex-col">
-        Percentage of Majors: {pctMajors}%
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={pctMajors}
-          onChange={(e) => setPctMajors(Number(e.target.value))}
-          className="accent-blue-600"
-        />
-      </label>
-      <label className="flex flex-col">
-        Percentage STEM: {pctSTEM}%
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={pctSTEM}
-          onChange={(e) => setPctSTEM(Number(e.target.value))}
-          className="accent-blue-600"
-        />
-      </label>
-      <label className="flex flex-col">
-        General Education:
-        <select
-          value={generalEducation}
-          onChange={(e) => setGeneralEducation(e.target.value)}
-          className="border p-2 rounded"
-        >
-          <option value="Yes">Yes</option>
-          <option value="No">No</option>
-          <option value="Unsure/Other">Unsure/Other</option>
-        </select>
-      </label>
-      <label className="flex flex-col">
-        Level:
-        <select
-          value={level}
-          onChange={(e) => setLevel(e.target.value)}
-          className="border p-2 rounded"
-        >
-          <option value="Introductory Undergrade">Introductory Undergrade</option>
-          <option value="Advanced Undergraduate">Advanced Undergraduate</option>
-          <option value="Graduate">Graduate</option>
-          <option value="Other">Other</option>
-        </select>
-      </label>
-      
-      <label className="flex flex-col">
-        Type:
-        <select
-          value={courseType}
-          onChange={(e) => setCourseType(e.target.value)}
-          className="border p-2 rounded"
-        >
-          <option value="Lecture">Lecture</option>
-          <option value="Lab">Lab</option>
-          <option value="Seminar/Discussion">Seminar/Discussion</option>
-          <option value="Other">Other</option>
-        </select>
-      </label>
-
-      <hr className="my-8 border-t-2 border-gray-300" />
-      <h2 className="text-2xl font-semibold mb-4">Additional Information</h2>
-      <label className="flex flex-col">
-        Additional Info:
-        <textarea
-          value={additionalInfo}
-          onChange={(e) => setAdditionalInfo(e.target.value)}
-          className="border p-2 rounded"
-          rows={4}
-        />
-      </label>
-      
-      <button
-        type="submit"
-        className="bg-blue-600 text-white rounded p-2 hover:bg-blue-700"
-      >
-        Add Course
-      </button>
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {renderStepIndicator()}
+      {renderStepContent()}
+      {renderNavigation()}
     </form>
   );
 }
