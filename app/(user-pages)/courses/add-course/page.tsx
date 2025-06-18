@@ -13,7 +13,12 @@ export default function AddCoursePage() {
         Add New Course:{ ' ' }
         {meta.title && (
           <span className="text-muted-foreground">
-            {meta.title} ({meta.department} {meta.numberCode})
+            {meta.title}
+          </span>
+        )}
+        {meta.department && meta.numberCode && (
+          <span className="text-muted-foreground">
+            { ' ' }({meta.department} {meta.numberCode})
           </span>
         )}
       </h1>
