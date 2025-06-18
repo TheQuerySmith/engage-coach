@@ -27,7 +27,7 @@ export default async function FetchSurveys() {
       instructor_course_survey_responses ( survey_n, status ),
       course_survey_windows ( survey_n, open_at, close_at ),
       student_course_survey_responses ( survey_n, status )
-    `)
+    `, { next: { revalidate: 0 } })
     .eq('user_id', currentUser.id);
   if (courseError || !courses) {
     return <p>Failed to load courses: {courseError?.message}</p>;
