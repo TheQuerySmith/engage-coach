@@ -439,26 +439,6 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
     }
   }, [title, department, numberCode, onMetaChange]);
 
-  useEffect(() => {
-    async function fetchDepartment() {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-      if (user && !userError) {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('department')
-          .eq('id', user.id)
-          .single();
-        if (!error && data?.department) {
-          setDepartment(data.department);
-        }
-      }
-    }
-    fetchDepartment();
-  }, [supabase]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
