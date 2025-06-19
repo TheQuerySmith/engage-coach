@@ -41,13 +41,9 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
   // Step management
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 4;
-  const [step4Visited, setStep4Visited] = useState(false);
 
   const nextStep = () => {
     if (currentStep < totalSteps) {
-      if (currentStep === 3) {
-        setStep4Visited(true);
-      }
       setCurrentStep(currentStep + 1);
     }
   };
@@ -401,28 +397,34 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
 
   const renderNavigation = () => (
     <div className="flex justify-between items-center mt-8 pt-6 border-t">
-      <Button
-        type="button"
-        variant="outline"
-        onClick={prevStep}
-        disabled={currentStep === 1}
-      >
-        Previous
-      </Button>
+      {currentStep > 1 ? (
+        <Button
+          type="button"
+          variant="outline"
+          onClick={prevStep}
+        >
+          Previous
+        </Button>
+      ) : <div style={{ width: '1px' }} />}
 
       <div className="flex space-x-2">
-        {currentStep < totalSteps ? (
+        {currentStep < totalSteps && (
           <Button
+            key="next"
             type="button"
             onClick={nextStep}
             disabled={!isStepComplete(currentStep)}
-            title={!isStepComplete(currentStep) ? 'Please update course information before continuing' : undefined}
-            className={!isStepComplete(currentStep) ? 'disabled:pointer-events-auto' : ''}
           >
             Next
           </Button>
-        ) : (
-          <Button type="submit" disabled={!isStepComplete(4)}>
+        )}
+
+        {currentStep === totalSteps && (
+          <Button
+            key="submit"
+            type="submit"
+            disabled={!isStepComplete(4)}
+          >
             {initialCourse ? 'Update Course' : 'Add Course'}
           </Button>
         )}
@@ -460,14 +462,9 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // If the user is not on the final step, treat "Enter" as "Next"
-    if (currentStep < totalSteps) {
-      if (isStepComplete(currentStep)) {
-        nextStep();
-      } else {
-        alert("Please complete the current section before continuing.");
-      }
-      return; // Do NOT submit yet
+    // Only allow submission if on the last step and the submit button was used
+    if (currentStep !== totalSteps) {
+      return;
     }
 
     // Final step – proceed with actual submission
