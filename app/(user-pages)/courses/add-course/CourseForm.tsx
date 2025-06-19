@@ -11,31 +11,32 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 interface CourseFormProps {
-  onSuccess: (message: string) => void;
+  onSuccess?: (message: string) => void;
   onMetaChange?: (info: { title: string; department: string; numberCode: string }) => void;
+  initialCourse?: any;
 }
 
-export default function CourseForm({ onSuccess, onMetaChange }: CourseFormProps) {
+export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: CourseFormProps) {
   const router = useRouter();
   const supabase = createClient();
 
   // Course fields based on the schema
-  const [title, setTitle] = useState('');
-  const [department, setDepartment] = useState('');
-  const [numberCode, setNumberCode] = useState('');
-  const [nSections, setNSections] = useState(1);
-  const [nStudents, setNStudents] = useState(0);
-  const [pctMajors, setPctMajors] = useState(0);
-  const [pctSTEM, setPctSTEM] = useState(0);
+  const [title, setTitle] = useState(initialCourse?.title ?? '');
+  const [department, setDepartment] = useState(initialCourse?.department ?? '');
+  const [numberCode, setNumberCode] = useState(initialCourse?.number_code ?? '');
+  const [nSections, setNSections] = useState(initialCourse?.n_sections ?? 1);
+  const [nStudents, setNStudents] = useState(initialCourse?.n_students ?? 0);
+  const [pctMajors, setPctMajors] = useState(initialCourse?.pct_majors ?? 0);
+  const [pctSTEM, setPctSTEM] = useState(initialCourse?.pct_stem ?? 0);
   // New dropdown fields with "Other" defaults
-  const [generalEducation, setGeneralEducation] = useState('Unsure/Other');
-  const [level, setLevel] = useState('Other');
-  const [courseType, setCourseType] = useState('Lecture');
-  const [format, setFormat] = useState('In-Person');
-  const [additionalInfo, setAdditionalInfo] = useState('');
-  const [pctInstructorDecision, setPctInstructorDecision] = useState(0);
-  const [pctInstructorSynchronous, setPctInstructorSynchronous] = useState(0);
-  const [pctInstructorAsynchronous, setPctInstructorAsynchronous] = useState(0);
+  const [generalEducation, setGeneralEducation] = useState(initialCourse?.general_education ?? 'Unsure/Other');
+  const [level, setLevel] = useState(initialCourse?.level ?? 'Other');
+  const [courseType, setCourseType] = useState(initialCourse?.type ?? 'Lecture');
+  const [format, setFormat] = useState(initialCourse?.format ?? 'In-Person');
+  const [additionalInfo, setAdditionalInfo] = useState(initialCourse?.additional_info ?? '');
+  const [pctInstructorDecision, setPctInstructorDecision] = useState(initialCourse?.pct_instructor_decision ?? 0);
+  const [pctInstructorSynchronous, setPctInstructorSynchronous] = useState(initialCourse?.pct_instructor_synchronous ?? 0);
+  const [pctInstructorAsynchronous, setPctInstructorAsynchronous] = useState(initialCourse?.pct_instructor_asynchronous ?? 0);
 
   // Step management
   const [currentStep, setCurrentStep] = useState(1);
@@ -506,7 +507,7 @@ export default function CourseForm({ onSuccess, onMetaChange }: CourseFormProps)
     } else if (insertedCourses && insertedCourses.length > 0) {
       const newCourse = insertedCourses[0];
       console.log("New course inserted:", newCourse);
-      onSuccess("Course added successfully!");
+      onSuccess && onSuccess("Course added successfully!");
       // Redirect to the newly created course details page using its short_id
       router.push(`/courses/${newCourse.short_id}/set-dates`);
     } else {

@@ -40,6 +40,10 @@ A full-stack web application to streamline the administration, delivery, and rep
  - [ ] clsx to highlight path route: https://nextjs.org/learn/dashboard-app/navigating-between-pages
  - [ ] Add warnings on invalid sign-in credentials
  - [ ] Make dashboard available when signed in
+ - [ ] Add search to student ids
+ - [ ] Update course form to use Form component (https://nextjs.org/learn/dashboard-app/mutating-data) and errors (https://nextjs.org/learn/dashboard-app/improving-accessibility)
+ - [ ] Add error.tsx pages on unexpected errors
+ - [ ] Parse our redundant code in create and edit course
 
 
 ### Bug Fixes
@@ -51,12 +55,11 @@ A full-stack web application to streamline the administration, delivery, and rep
 - [ ] middleware.ts should redirect to signin if not logged in (not just profile)
 - [ ] Ensure users can't change their profile.id or other locked fields
 - [ ] Trim and lowercase student ids for better matching
-- [ ] In course add, weird 0 requirement when adding student numbers
 - [ ] Ensure non-overlapping survey windows
 - [ ] Default survey open/close at midnight of local time
 - [ ] Create and edit courses should have explaination and correct dropdowns
 - [ ] RLS policies (user_ulpoads, user_reports, discussion_signups) need RLS policies
-- [ ] Delete old dashboad tables (checklist_items, user_checklilst)
+- [ ] Need to validate course variables on creation
 
 ### Refactoring
 - [ ] Remove unnessary effects
