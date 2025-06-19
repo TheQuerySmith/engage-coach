@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
-import EditCourseForm from './EditCourseForm';
+import CourseForm from '@/app/(user-pages)/courses/add-course/CourseForm';
 
 export default async function EditCoursePage(props: { params: Promise<{ short_id: string }> }) {
   const params = await props.params;
@@ -21,7 +21,7 @@ export default async function EditCoursePage(props: { params: Promise<{ short_id
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Edit Course</h1>
-      <EditCourseForm initialCourse={course} />
+      <CourseForm initialCourse={course} />
     </div>
   );
 }
