@@ -423,7 +423,7 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
           </Button>
         ) : (
           <Button type="submit" disabled={!isStepComplete(4)}>
-            Add Course
+            {initialCourse ? 'Update Course' : 'Add Course'}
           </Button>
         )}
       </div>
@@ -480,39 +480,73 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
       return;
     }
 
-    const { error, data: insertedCourses } = await supabase.from('courses').insert([
-      {
-        user_id: user.id,
-        title,
-        department,
-        number_code: numberCode,
-        n_sections: nSections,
-        n_students: nStudents,
-        pct_majors: pctMajors,
-        pct_stem: pctSTEM,
-        general_education: generalEducation,
-        level: level,
-        type: courseType,
-        format: format,
-        additional_info: additionalInfo,
-        pct_instructor_decision: pctInstructorDecision,
-        pct_instructor_synchronous: pctInstructorSynchronous,
-        pct_instructor_asynchronous: pctInstructorAsynchronous,
-      },
-    ])
-    .select('*');
+    let error, result;
+    if (initialCourse && initialCourse.short_id) {
+      // Update existing course
+      const { error: updateError, data: updatedCourses } = await supabase
+        .from('courses')
+        .update({
+          user_id: user.id,
+          title,
+          department,
+          number_code: numberCode,
+          n_sections: nSections,
+          n_students: nStudents,
+          pct_majors: pctMajors,
+          pct_stem: pctSTEM,
+          general_education: generalEducation,
+          level: level,
+          type: courseType,
+          format: format,
+          additional_info: additionalInfo,
+          pct_instructor_decision: pctInstructorDecision,
+          pct_instructor_synchronous: pctInstructorSynchronous,
+          pct_instructor_asynchronous: pctInstructorAsynchronous,
+        })
+        .eq('short_id', initialCourse.short_id)
+        .select('*');
+      error = updateError;
+      result = updatedCourses;
+    } else {
+      // Insert new course
+      const { error: insertError, data: insertedCourses } = await supabase.from('courses').insert([
+        {
+          user_id: user.id,
+          title,
+          department,
+          number_code: numberCode,
+          n_sections: nSections,
+          n_students: nStudents,
+          pct_majors: pctMajors,
+          pct_stem: pctSTEM,
+          general_education: generalEducation,
+          level: level,
+          type: courseType,
+          format: format,
+          additional_info: additionalInfo,
+          pct_instructor_decision: pctInstructorDecision,
+          pct_instructor_synchronous: pctInstructorSynchronous,
+          pct_instructor_asynchronous: pctInstructorAsynchronous,
+        },
+      ]).select('*');
+      error = insertError;
+      result = insertedCourses;
+    }
 
     if (error) {
-      alert("Error adding course: " + error.message);
-    } else if (insertedCourses && insertedCourses.length > 0) {
-      const newCourse = insertedCourses[0];
-      console.log("New course inserted:", newCourse);
-      onSuccess && onSuccess("Course added successfully!");
-      // Redirect to the newly created course details page using its short_id
-      router.push(`/courses/${newCourse.short_id}/set-dates`);
+      alert(initialCourse ? ("Error updating course: " + error.message) : ("Error adding course: " + error.message));
+    } else if (result && result.length > 0) {
+      const course = result[0];
+      if (initialCourse) {
+        onSuccess && onSuccess("Course updated successfully!");
+        router.push(`/courses/${course.short_id}`); // Redirect to course page after update
+      } else {
+        onSuccess && onSuccess("Course added successfully!");
+        router.push(`/courses/${course.short_id}/set-dates`);
+      }
     } else {
-      console.error("No data returned from insert", insertedCourses);
-      alert("Course was added, but could not retrieve new course data.");
+      console.error("No data returned from operation", result);
+      alert(initialCourse ? "Course was updated, but could not retrieve course data." : "Course was added, but could not retrieve new course data.");
       router.push("/courses");
     }
   };
