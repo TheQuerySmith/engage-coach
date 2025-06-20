@@ -6,25 +6,25 @@ export default function AboutPage() {
       name: "Eric N. Smith, Ph.D.",
       role: "Principal Investigator",
       image: "/images/smith-headshot.jpg",
-      bio: "Research associate in the Population Research Center at The University of Texas at Austin, specializing in motivation and measurement in higher‑education STEM."
+      bio: "Research Associate at The University of Texas at Austin"
     },
     {
       name: "Afiya Fredericks, Ph.D.",
       role: "Co‑Principal Investigator",
       image: "/images/fredericks-headshot.jpg",
-      bio: "Assistant Professor at the University of the District of Columbia, expert in belonging and minoritized‑student success."
+      bio: "Assistant Professor at the University of the District of Columbia"
     },
     {
       name: "Kali Trzesniewski, Ph.D.",
       role: "Co‑Principal Investigator",
       image: "/images/trzesniewski-headshot.jpg",
-      bio: "Associate Specialist in Cooperative Extension at the University of California, Davis, focusing on growth‑mindset research and teacher professional learning."
+      bio: "Associate Specialist in Cooperative Extension at the University of California, Davis"
     },
     {
       name: "David Yeager, Ph.D.",
       role: "Co‑Principal Investigator",
       image: "/images/yeager-headshot.jpg",
-      bio: "Associate Professor at The University of Texas at Austin; provides feedback and organizes data and support."
+      bio: "Associate Professor at The University of Texas at Austin"
     }
   ];
 
@@ -38,7 +38,7 @@ export default function AboutPage() {
     { name: "Nirel JonesMitchell", role: "Research Assistant" },
     { name: "Sarah Leckey", role: "Postdoctoral Scholar" },
     { name: "Terri Matiella", role: "Collaborator" },
-    { name: "Natassia Merrill", role: "Lead Designer" },
+    { name: "Natassia Merrill", role: "UX/Materials Developer" },
     { name: "Mary Murphy", role: "Advisory Board" },
     { name: "Barbara Schneider", role: "Advisory Board" },
     { name: "Marika Sigal", role: "PhD Student" },
@@ -80,17 +80,18 @@ export default function AboutPage() {
                     ))}
                   </div>
                 </section>
-        
+
                 {/* Additional Contributors */}
                 <section className="mt-16">
                   <h2 className="text-3xl font-bold mb-4 text-center">Project Contributors</h2>
-                  <ul className="mx-auto max-w-3xl space-y-2 text-center">
+                  <div className="mx-auto max-w-3xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-center">
                     {supporters.map((supporter) => (
-                      <li key={supporter.name} className="text-lg">
-                        {supporter.name} <span className="text-muted-foreground">({supporter.role})</span>
-                      </li>
+                      <div key={supporter.name} className="py-4 flex flex-col items-center">
+                        <span className="text-lg font-medium">{supporter.name}</span>
+                        <span className="text-sm text-muted-foreground">{supporter.role}</span>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </section>
           <h1 className="text-4xl font-bold mt-12 mb-6 text-center">About Our Project</h1>
         <section className="mb-8">
@@ -99,18 +100,18 @@ export default function AboutPage() {
             This program began in 2022 with support from the U.S. National Science Foundation (NSF Award #2201928). Our mission is to create the first scalable, student-report measure of STEM teaching practices so that instructors and researchers can see—with data—which classroom strategies truly foster engagement, persistence, and equity in undergraduate STEM courses. Over two-and-a-half years we refined the survey through four pilot studies, gathering more than 9,000 student responses and dozens of interviews across multiple institutions.
           </p>
         </section>
-        <section className="mb-8">
+        {/* <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-2">An Unexpected Turn</h2>
           <p className="text-lg mb-4">
             In April 2025, our award was terminated by NSF. Although disappointing, we decided this project was too important to stop. Bridge funding from the University of Texas at Austin and volunteer effort from the whole research team have kept the survey alive, while we pursue new support to finish the validation and broadly release the measure to instructors like you.
           </p>
-        </section>
+        </section> */}
         
 
         
 
         <h2 className="text-4xl font-bold mt-12 mb-6 text-center">About The Surveys</h2>
-        <p>We will put more information here shortly</p>
+        <p>We will put more information here shortly. Stay tuned!</p>
       </div>
     </div>
     
