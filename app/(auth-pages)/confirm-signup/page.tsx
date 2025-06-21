@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { Button } from '@/components/ui/button';
 import Link from "next/link";
 
-export default function ConfirmSignupPage() {
+function ConfirmSignupContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -130,5 +130,24 @@ export default function ConfirmSignupPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="flex-1 flex flex-col min-w-64">
+      <h1 className="text-2xl font-medium">Confirm Your Email</h1>
+      <p className="text-sm text-foreground">
+        Loading confirmation details...
+      </p>
+    </div>
+  );
+}
+
+export default function ConfirmSignupPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <ConfirmSignupContent />
+    </Suspense>
   );
 } 
