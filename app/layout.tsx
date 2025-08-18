@@ -42,7 +42,7 @@ export default function RootLayout({
                 {/* This div reserves the left space to align with the sidebar */}
                 <div className="w-64">
                   <Link href="/" className="text-lg font-bold">
-                    Engage Coach
+                    NEAT Surveys
                   </Link>
                 </div>
                 <div className="flex space-x-4">

@@ -5,7 +5,7 @@ export default async function Home() {
     <div className="min-h-3/4 flex flex-col items-center justify-center bg-background p-8">
       <div className="max-w-3xl text-center">
         <h1 className="text-4xl sm:text-5xl font-bold mb-2">
-          Engage Your Students—Transform Your Classroom
+          Understand Your Students—Transform Your Classroom
         </h1>
         <div className="w-60 h-1 bg-blue-500 mx-auto mb-6"></div>
         <p className="text-lg text-foreground mb-8">
