@@ -1,6 +1,6 @@
 # Instructor Survey Platform
 
-A full-stack web application to streamline the administration, delivery, and reporting of student surveys for college instructors. Built using **Next.js**, **Supabase**, and **Qualtrics**, , the platform allows instructors to create accounts, launch surveys, and receive reports, while giving internal team members administrative oversight and automation tools.
+A full-stack web application to streamline the administration, delivery, and reporting of student surveys for college instructors. Built using **Next.js**, **Supabase**, and **Qualtrics**, , the platform allows instructors to create accounts, launch surveys, and receive reports, while giving internal team members administrative oversight and automation tools. Supporting tools include **Resend** for email notifications, and **R**/**R Studio** for report generation.
 
 ---
 
