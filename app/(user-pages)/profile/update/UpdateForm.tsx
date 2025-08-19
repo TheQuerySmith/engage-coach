@@ -79,7 +79,7 @@ export default function UpdateProfileField({
         toast.error(`Update failed: ${error.message}`);
       } else {
         originalValueRef.current = clean;
-        toast.success(`${label} saved!`);
+        //toast.success(`${label} saved!`);
       }
     });
   }

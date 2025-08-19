@@ -308,7 +308,7 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
 
             {/* Percentage Majors */}
             <div className="flex items-center gap-4">
-              <Label htmlFor="pctMajors">% majors in course department</Label>
+                <Label htmlFor="pctMajors">Approximately what percentage of students are majoring in {department || "the department"}</Label>
               <Input
                 id="pctMajors"
                 type="number"
@@ -324,7 +324,7 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
 
             {/* Percentage STEM */}
             <div className="flex items-center gap-4">
-              <Label htmlFor="pctSTEM">% STEM majors (any department)</Label>
+              <Label htmlFor="pctSTEM">Approximately what percentage of students are majoring in STEM (including {department || "the department"})</Label>
               <Input
                 id="pctSTEM"
                 type="number"
@@ -340,7 +340,7 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
 
             {/* General Education */}
             <div className="flex items-center gap-4">
-              <Label htmlFor="generalEducation">General-education requirement?</Label>
+                <Label htmlFor="generalEducation">Does this course fulfill a general education requirement?</Label>
               <select
                 id="generalEducation"
                 value={generalEducation}
@@ -355,7 +355,7 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
 
             {/* Level */}
             <div className="flex items-center gap-4">
-              <Label htmlFor="level">Course level</Label>
+              <Label htmlFor="level">What is this typical population of this course?</Label>
               <select
                 id="level"
                 value={level}

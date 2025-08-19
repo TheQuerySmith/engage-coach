@@ -94,7 +94,16 @@ export default async function ProfilePage() {
         />
       </div>
 
-      <details className="mt-6 border rounded-md">
+      <div className="flex justify-center mt-8">
+        <Link
+          href="/dashboard"
+          className="inline-block px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        >
+          Update Profile
+        </Link>
+      </div>
+
+      <details className="mt-6 border rounded-md hidden">
         <summary className="cursor-pointer px-4 py-2 font-medium bg-gray-100">
           Additional User Info (for support)
         </summary>
