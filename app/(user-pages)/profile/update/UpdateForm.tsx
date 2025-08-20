@@ -109,6 +109,11 @@ export default function UpdateProfileField({
     <>
       <form onSubmit={handleSubmit} className="space-y-2">
         <Label htmlFor={column}>{label}</Label>
+        {note && (
+            <p className="text-xs text-blue-700 bg-blue-50 rounded px-1 py-0.5 border-l-2 border-blue-400 mb-1">
+            {note}
+            </p>
+        )}
         <Input
           id={column}
           placeholder={placeholder}
@@ -119,7 +124,6 @@ export default function UpdateProfileField({
             save();
           }}
         />
-        {note && <p className="text-sm text-gray-500">{note}</p>}
       </form>
       <ToastContainer position="bottom-right" autoClose={1500} limit={3} />
     </>
