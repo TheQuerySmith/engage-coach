@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Breadcrumb from "@/components/ui/breadcrumb";
 import { ToastContainer } from "react-toastify";
 import Sidebar from "@/components/ui/sidebar";
