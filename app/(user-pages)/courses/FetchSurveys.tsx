@@ -71,10 +71,18 @@ export default async function FetchSurveys() {
           <table className="min-w-full border-collapse border border-gray-300">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-4 py-2 border border-gray-300">Survey</th>
-                <th className="px-4 py-2 border border-gray-300">Instructor Survey</th>
-                <th className="px-4 py-2 border border-gray-300">Student Survey</th>
-                <th className="px-4 py-2 border border-gray-300">Report Links</th>
+                <th className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                  Survey
+                </th>
+                <th className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                  Instructor Survey
+                </th>
+                <th className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                  Student Survey
+                </th>
+                <th className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                  Report Links
+                </th>
               </tr>
             </thead>
             <tbody>
