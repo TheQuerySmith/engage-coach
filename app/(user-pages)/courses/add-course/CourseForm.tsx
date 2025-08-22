@@ -26,17 +26,17 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
   const [numberCode, setNumberCode] = useState(initialCourse?.number_code ?? '');
   const [nSections, setNSections] = useState(initialCourse?.n_sections ?? 1);
   const [nStudents, setNStudents] = useState(initialCourse?.n_students ?? 0);
-  const [pctMajors, setPctMajors] = useState(initialCourse?.pct_majors ?? 0);
-  const [pctSTEM, setPctSTEM] = useState(initialCourse?.pct_stem ?? 0);
+  const [pctMajors, setPctMajors] = useState(initialCourse?.pct_majors ?? "");
+  const [pctSTEM, setPctSTEM] = useState(initialCourse?.pct_stem ?? "");
   // New dropdown fields with "Other" defaults
   const [generalEducation, setGeneralEducation] = useState(initialCourse?.general_education ?? 'Unsure/Other');
   const [level, setLevel] = useState(initialCourse?.level ?? 'Other');
   const [courseType, setCourseType] = useState(initialCourse?.type ?? 'Lecture');
   const [format, setFormat] = useState(initialCourse?.format ?? 'In-Person');
   const [additionalInfo, setAdditionalInfo] = useState(initialCourse?.additional_info ?? '');
-  const [pctInstructorDecision, setPctInstructorDecision] = useState(initialCourse?.pct_instructor_decision ?? 0);
-  const [pctInstructorSynchronous, setPctInstructorSynchronous] = useState(initialCourse?.pct_instructor_synchronous ?? 0);
-  const [pctInstructorAsynchronous, setPctInstructorAsynchronous] = useState(initialCourse?.pct_instructor_asynchronous ?? 0);
+  const [pctInstructorDecision, setPctInstructorDecision] = useState(initialCourse?.pct_instructor_decision ?? "");
+  const [pctInstructorSynchronous, setPctInstructorSynchronous] = useState(initialCourse?.pct_instructor_synchronous ?? "");
+  const [pctInstructorAsynchronous, setPctInstructorAsynchronous] = useState(initialCourse?.pct_instructor_asynchronous ?? "");
 
   // Step management
   const [currentStep, setCurrentStep] = useState(1);
@@ -63,7 +63,7 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
       case 1:
         return title.trim() !== '' && department.trim() !== '' && numberCode.trim() !== '';
       case 2:
-        return pctInstructorDecision > 0 && pctInstructorSynchronous > 0 && pctInstructorAsynchronous > 0;
+        return pctInstructorDecision !== "" && pctInstructorSynchronous !== "" && pctInstructorAsynchronous !== "";
       case 3:
         return nStudents > 0;
       case 4:
@@ -236,7 +236,7 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
                   type="number"
                   min="0"
                   max="100"
-                  value={pctInstructorDecision === 0 ? '' : pctInstructorDecision}
+                  value={pctInstructorDecision}
                   onChange={(e) => setPctInstructorDecision(Number(e.target.value) || 0)}
                   placeholder="0-100"
                   className="max-w-20"
@@ -256,7 +256,7 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
                   type="number"
                   min="0"
                   max="100"
-                  value={pctInstructorSynchronous === 0 ? '' : pctInstructorSynchronous}
+                  value={pctInstructorSynchronous}
                   onChange={(e) => setPctInstructorSynchronous(Number(e.target.value) || 0)}
                   placeholder="0-100"
                   className="max-w-20"
@@ -276,7 +276,7 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
                   type="number"
                   min="0"
                   max="100"
-                  value={pctInstructorAsynchronous === 0 ? '' : pctInstructorAsynchronous}
+                  value={pctInstructorAsynchronous}
                   onChange={(e) => setPctInstructorAsynchronous(Number(e.target.value) || 0)}
                   placeholder="0-100"
                   className="max-w-20"
@@ -314,7 +314,7 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
                 type="number"
                 min="0"
                 max="100"
-                value={pctMajors === 0 ? '' : pctMajors}
+                value={pctMajors}
                 onChange={(e) => setPctMajors(Number(e.target.value) || 0)}
                 placeholder="0-100"
                 className="max-w-20"
@@ -330,7 +330,7 @@ export default function CourseForm({ onSuccess, onMetaChange, initialCourse }: C
                 type="number"
                 min="0"
                 max="100"
-                value={pctSTEM === 0 ? '' : pctSTEM}
+                value={pctSTEM}
                 onChange={(e) => setPctSTEM(Number(e.target.value) || 0)}
                 placeholder="0-100"
                 className="max-w-20"
