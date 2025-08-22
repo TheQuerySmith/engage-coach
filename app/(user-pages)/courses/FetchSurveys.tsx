@@ -163,7 +163,17 @@ export default async function FetchSurveys() {
                     </td>
                     <td className="px-4 py-2 border border-gray-300 text-center">
                       {openInfo ? (
-                        openInfo
+                        <>
+                          {openInfo}{' '}
+                          <Link
+                            href={studentSurveyLink}
+                            className="text-blue-500 hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            (LINK)
+                          </Link>
+                        </>
                       ) : (
                         <span className={studentColor}>
                           {studentsCompleted}{' '}

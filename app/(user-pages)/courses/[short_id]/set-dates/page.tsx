@@ -117,7 +117,7 @@ export default function SetDatesPage() {
       }
     }
     setSaving(false);
-    router.push(`/courses/${short_id}`);
+    router.push(`/courses`);
   };
 
   if (loading) return <p>Loading...</p>;
