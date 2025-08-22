@@ -13,7 +13,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Engage Coach",
+  title: "NEAT Surveys",
   description: "Instructors helping instructors succeed"
 };
 
