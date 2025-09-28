@@ -21,7 +21,7 @@ export default function ResetPasswordPage() {
 
   // Read token_hash and type from query string
   const token_hash = searchParams.get("token_hash");
-  const type = searchParams.get("type");
+  const type = searchParams.get("type") as import("@supabase/auth-js").MobileOtpType | import("@supabase/auth-js").EmailOtpType | null;
 
   // Check if user is signed in or has a valid OTP
   useEffect(() => {
@@ -42,19 +42,24 @@ export default function ResetPasswordPage() {
 
       // 2. If not signed in, try OTP verification if params exist
       if (token_hash && type) {
-        const { error } = await supabase.auth.verifyOtp({
-          token_hash,
-          type,
-        });
-        if (!cancelled) {
-          if (error) {
-            setError("Invalid or expired link. Please request a new password reset.");
-            setCanShowForm(false);
-          } else {
-            setCanShowForm(true);
-            // Force a refresh so server components (header) see the new session
-            router.refresh();
+        // Only allow "email" or "recovery" for password reset
+        if (type === "email" || type === "recovery") {
+          const { error } = await supabase.auth.verifyOtp({
+            token_hash,
+            type, // type is EmailOtpType here
+          });
+          if (!cancelled) {
+            if (error) {
+              setError("Invalid or expired link. Please request a new password reset.");
+              setCanShowForm(false);
+            } else {
+              setCanShowForm(true);
+            }
+            setChecking(false);
           }
+        } else {
+          setError("Invalid OTP type for password reset.");
+          setCanShowForm(false);
           setChecking(false);
         }
         return;
