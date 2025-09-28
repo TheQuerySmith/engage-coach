@@ -52,6 +52,8 @@ export default function ResetPasswordPage() {
             setCanShowForm(false);
           } else {
             setCanShowForm(true);
+            // Force a refresh so server components (header) see the new session
+            router.refresh();
           }
           setChecking(false);
         }
