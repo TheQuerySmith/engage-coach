@@ -16,6 +16,7 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
           Sign up
         </Link>
       </p>
+      <FormMessage message={searchParams} />
       <div className="flex flex-col gap-2 [&>input]:mb-3 mt-8">
         <Label htmlFor="email">Email</Label>
         <Input name="email" placeholder="you@example.com" required />
@@ -37,7 +38,6 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
         <SubmitButton pendingText="Signing In..." formAction={signInAction}>
           Sign in
         </SubmitButton>
-        <FormMessage message={searchParams} />
       </div>
     </form>
   );
